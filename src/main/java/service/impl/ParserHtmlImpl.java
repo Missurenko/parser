@@ -20,8 +20,10 @@ public class ParserHtmlImpl implements ParserHtml {
         if (containKeyWordInDoc(doc, keyWordList)) {
             Element allElement = doc.getAllElements().first();
             List<Element> depth = allHierarchyList(allElement);
+            List<Element> filter = containKeyWordInElement(depth, keyWordList);
 
-            String ss = "ss";
+
+            String sss = "ss";
 
             for (Element element : result) {
                 if (containKeyWordInDoc(doc, keyWordList)) {
@@ -53,7 +55,12 @@ public class ParserHtmlImpl implements ParserHtml {
         return result;
     }
 
-
+    private String parserHtml(Element element0, Element element1) {
+        String main = element0.toString();
+        String children = element1.toString();
+        main.split(children);
+        return main;
+    }
 
 
     private boolean containKeyWordInDoc(Document doc, List<String> keyWords) {
@@ -65,13 +72,16 @@ public class ParserHtmlImpl implements ParserHtml {
         return false;
     }
 
-    private boolean containKeyWordInElement(Element element, List<String> keyWords) {
+    private List<Element> containKeyWordInElement(List<Element> elementList, List<String> keyWords) {
+        List<Element> result = new ArrayList<>();
         for (String keyWord : keyWords) {
-            if (element.text().contains(keyWord)) {
-                return true;
+            for (Element element : elementList) {
+                if (element.text().contains(keyWord)) {
+                    result.add(element);
+                }
             }
         }
-        return false;
+        return result;
     }
 
 }
