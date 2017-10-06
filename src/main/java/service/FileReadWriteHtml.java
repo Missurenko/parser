@@ -13,5 +13,5 @@ public interface FileReadWriteHtml {
 
 
 
-    boolean writeToDir(List<Element> elementList, String fullDirPathResult, String nameDoc);
+    boolean writeToDir(String html, String fullDirPathResult, String nameDoc);
 }

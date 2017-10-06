@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
 
@@ -19,9 +21,14 @@ public class Main {
         FileReadWriteHtml fileReadWriteHtml = new FileReadWriteHtmlImpl();
         ParserHtml parserHtml = new ParserHtmlImpl();
         List<File> fileList = fileReadWriteHtml.readDir(PATH_NAME);
+        String[] patt={"User1.*Lua"};
+        String res = ParserHtmlImpl.delPatterns(PATH_NAME,patt);
+        System.out.printf(res);
         for (File file : fileList) {
-            List<Element> elementList = parserHtml.getSortedHtml(file, KEY_WORDS);
 
+//            String html = parserHtml.getSortedHtml(file, KEY_WORDS);
+
+//            fileReadWriteHtml.writeToDir("C:\\Users\\User1\\IdeaProjects\\learnLua\\result", html, "Агуша");
         }
     }
 }

@@ -10,6 +10,8 @@ public class Tree {
 
     private List<Tree> treeList;
 
+    boolean flag;
+
     public Element getElement() {
         return element;
     }
@@ -24,5 +26,13 @@ public class Tree {
 
     public void setTreeList(List<Tree> treeList) {
         this.treeList = treeList;
+    }
+
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
     }
 }
