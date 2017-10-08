@@ -21,6 +21,10 @@ public class ParserHtmlImpl implements ParserHtml {
         if (containKeyWordInDoc(doc, keyWordList)) {
             Element allElement = doc.getAllElements().first();
             Tree tree = new Tree();
+            allElement.getAllElements().first();
+            for (int i = 0; i < allElement.children().size(); i++) {
+
+            }
             tree.setElement(allElement);
 
             Tree hierarchyHtml = decomposeHierarchy(tree);
@@ -69,7 +73,7 @@ public class ParserHtmlImpl implements ParserHtml {
                 treeChild.setElement(elementChild);
                 treeHierarchy.add(treeChild);
             }
-              tree.setTreeList(treeHierarchy);
+            tree.setTreeList(treeHierarchy);
 
             for (Tree treeChild : treeHierarchy) {
                 Tree result = decomposeHierarchy(treeChild);
