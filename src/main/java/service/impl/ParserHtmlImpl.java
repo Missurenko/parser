@@ -88,14 +88,6 @@ public class ParserHtmlImpl implements ParserHtml {
         return result;
     }
 
-    private String parserHtml(Element element0, Element element1) {
-        String main = element0.toString();
-        String children = element1.toString();
-        main.split(children);
-        return main;
-    }
-
-
     private boolean containKeyWordInDoc(Document doc, List<String> keyWords) {
         for (String keyWord : keyWords) {
             if (doc.text().contains(keyWord)) {

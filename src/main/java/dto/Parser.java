@@ -18,13 +18,9 @@ import java.util.stream.Collectors;
  */
 public class Parser {
 
-
     private Element element;
-
     private List<String> keyWordList;
-
     private List<String> filterTag;
-
 
     public Parser(Element element, List<String> keyWordList, List<String> filterTag) {
         this.element = element;
@@ -37,35 +33,24 @@ public class Parser {
         return element;
     }
 
-
     private void deleteMetod(Element mainElement, int depthByOneMore) {
-
         List<Boolean> flagWhatDelete = new ArrayList<>();
         List<Element> elementsementWhatNoGoDeeper = new ArrayList<>();
         for (int i = 0; i < mainElement.children().size(); i++) {
             boolean flag = getFlagByFilters(mainElement.child(i), mainElement);
-
 //            if (depthByOneMore > 5) {
 //                if (noNeedGoDeeper(mainElement) & flag) {
 //                    flag = false;
 //                    elementsementWhatNoGoDeeper.add(mainElement.child(i));
 //                }
 //            }
-
             flagWhatDelete.add(flag);
         }
         for (int i = flagWhatDelete.size() - 1; i > 0; --i) {
-//            int number = 0;
             if (flagWhatDelete.get(i)) {
-//                System.out.println("remove " + number);
-//                System.out.println("siblingIndex " + mainElement.child(i).siblingIndex());
                 mainElement.child(i).remove();
-//                number++;
             }
-
         }
-//
-
         for (Element child : mainElement.children()) {
             boolean goDepther = true;
 //            for (Element noNeedGoDeep : elementsementWhatNoGoDeeper) {
@@ -78,14 +63,11 @@ public class Parser {
                 deleteMetod(child, depthByOneMore);
             }
         }
-
-
     }
 
     private boolean depth(Element element) {
         return element.childNodeSize() != 0;
     }
-
 
     // think and chenge
     private boolean noNeedGoDeeper(Element parant) {
@@ -121,7 +103,6 @@ public class Parser {
         return true;
     }
 
-
     private boolean getFlagByFilters(Element child, Element parant) {
         boolean flag = false;
         // if contain tag script,noscript, style
@@ -136,10 +117,8 @@ public class Parser {
 // what we need by keyWord
         } else {
             flag = noContainKeyWordInElement(child, keyWordList);
-
             if (flag) {
                 List<Pattern> patternList = new ArrayList<>();
-
                 // TODO find or do some more pattern this date
                 Pattern pattern0 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)");
                 Pattern pattern1 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]).(0?[1-9]|1[012]).((19|20)\\d\\d)");
@@ -147,7 +126,6 @@ public class Parser {
                 patternList.add(pattern1);
                 //Here we find all document elements which have some element with the searched pattern
                 for (Pattern pattern : patternList) {
-
                     Elements elements = child.getElementsMatchingText(pattern);
                     if (elements.size() != 0) {
                         flag = false;
@@ -164,11 +142,8 @@ public class Parser {
         }
     }
 
-    private boolean isLastElem(Element elem, Pattern pattern) {
-        return elem.getElementsMatchingText(pattern).size() <= 1;
-    }
-    // do refactor
 
+    // use for doc in other location
     private boolean containKeyWordInDoc(Document doc, List<String> keyWords) {
         for (String keyWord : keyWords) {
             if (doc.text().contains(keyWord)) {

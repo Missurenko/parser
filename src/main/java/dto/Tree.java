@@ -10,6 +10,8 @@ public class Tree {
 
     private List<Tree> treeList;
 
+    private boolean deleteElement;
+
     public Element getElement() {
         return element;
     }
