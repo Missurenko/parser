@@ -6,11 +6,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 /**
@@ -21,6 +18,9 @@ public class Parser {
     private Element element;
     private List<String> keyWordList;
     private List<String> filterTag;
+
+    private int firstBlood;
+
 
     public Parser(Element element, List<String> keyWordList, List<String> filterTag) {
         this.element = element;
@@ -49,21 +49,115 @@ public class Parser {
         for (int i = flagWhatDelete.size() - 1; i > 0; --i) {
             if (flagWhatDelete.get(i)) {
                 mainElement.child(i).remove();
+                System.out.printf("Remove");
+            }
+        }
+
+
+        boolean flagDateResult = true;
+        for (Element child : mainElement.children()) {
+
+
+            boolean flagDate = dateFlagNoContain(child);
+            if (!flagDate) {
+                flagDateResult = false;
             }
         }
         for (Element child : mainElement.children()) {
             boolean goDepther = true;
-//            for (Element noNeedGoDeep : elementsementWhatNoGoDeeper) {
-//                if (child.equals(noNeedGoDeep)) {
-//                    goDepther = false;
-//                }
-//            }
-            if (goDepther) {
-                depthByOneMore++;
-                deleteMetod(child, depthByOneMore);
+
+            String ss = "ss";
+            // змінити звітси
+            int countKeyWordChild = 0;
+            if (mainElement.children().size() == 1) {
+                for (Element oneStepChild : child.children()) {
+                    if (!noContainKeyWordInElement(oneStepChild, keyWordList)) {
+                        countKeyWordChild++;
+                    }
+                }
+                if (countKeyWordChild >= 2 &
+                        !child.tag().toString().equals("body") &
+                        !child.tag().toString().equals("head")) {
+                }
+
+                // до сюди
+                String sss = "ss";
+                if (goDepther)
+
+                {
+
+                    depthByOneMore++;
+                    System.out.println(depthByOneMore);
+                    deleteMetod(child, depthByOneMore);
+                }
             }
+
         }
     }
+
+
+
+
+//    // змінити звітси
+//    int countKeyWordChild = 0;
+//            if (mainElement.children().size() == 1) {
+//
+//        for (Element oneStepChild : child.children()) {
+//            if (!noContainKeyWordInElement(oneStepChild, keyWordList)) {
+//                countKeyWordChild++;
+//            }
+//        }
+//        if (countKeyWordChild >= 2 &
+//                !child.tag().toString().equals("body") &
+//                !child.tag().toString().equals("head")) {
+//
+//            List<Pattern> patterns = new ArrayList<>();
+//            for (String keyWord : keyWordList) {
+//                patterns.add(Pattern.compile(keyWord));
+//            }
+//            String ss = "ss";
+//            for (Pattern patternKeyWord : patterns) {
+//                for (Element oneStepChild : child.children()) {
+//                    if (!noContainKeyWordInElement(oneStepChild, keyWordList)) {
+//                        List<Element> elementsChild = oneStepChild.getElementsMatchingText(patternKeyWord);
+//
+//
+//                        for(Element element: elementsChild){
+//                            if(element.children().size() == 0&
+//                                    element.tag().toString().equals("href")){
+//                                String ssss = "ss";
+//                                for (String keyWord : keyWordList) {
+//                                    if(element.getElementsMatchingText(keyWord).size() == 1){
+//
+//                                    }
+//
+//                                }
+//
+//
+//                            }
+//                        }
+//
+//
+//                    }
+//
+//
+//                }
+//            }
+//
+//
+//        }
+//
+//
+//        if (
+//                !flagDateResult){
+//
+//            goDepther = false;
+//        }
+//
+//
+//    }
+//
+//    // до сюди
 
     private boolean depth(Element element) {
         return element.childNodeSize() != 0;
@@ -118,30 +212,36 @@ public class Parser {
         } else {
             flag = noContainKeyWordInElement(child, keyWordList);
             if (flag) {
-                List<Pattern> patternList = new ArrayList<>();
-                // TODO find or do some more pattern this date
-                Pattern pattern0 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)");
-                Pattern pattern1 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]).(0?[1-9]|1[012]).((19|20)\\d\\d)");
-                patternList.add(pattern0);
-                patternList.add(pattern1);
-                //Here we find all document elements which have some element with the searched pattern
-                for (Pattern pattern : patternList) {
-                    Elements elements = child.getElementsMatchingText(pattern);
-                    if (elements.size() != 0) {
-                        flag = false;
-                    }
-//                    List<Element> finalElements = elements.stream().filter(elem -> isLastElem(elem, pattern)).collect(Collectors.toList());
-//                    finalElements.stream().forEach(elem ->
-//                            System.out.println("Node: " + elem.html())
-//                    );
-//                    String ss = "ss";
-                }
+                flag = dateFlagNoContain(child);
                 return flag;
             }
             return flag;
         }
     }
 
+    private boolean dateFlagNoContain(Element child) {
+
+        List<Pattern> patternList = new ArrayList<>();
+        // TODO find or do some more pattern this date
+        Pattern pattern0 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)");
+        Pattern pattern1 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]).(0?[1-9]|1[012]).((19|20)\\d\\d)");
+        patternList.add(pattern0);
+        patternList.add(pattern1);
+        //Here we find all document elements which have some element with the searched pattern
+        for (Pattern pattern : patternList) {
+            Elements elements = child.getElementsMatchingText(pattern);
+            if (elements.size() <= 5 &
+                    elements.size() != 0) {
+                return false;
+            }
+//                    List<Element> finalElements = elements.stream().filter(elem -> isLastElem(elem, pattern)).collect(Collectors.toList());
+//                    finalElements.stream().forEach(elem ->
+//                            System.out.println("Node: " + elem.html())
+//                    );
+//                    String ss = "ss";
+        }
+        return true;
+    }
 
     // use for doc in other location
     private boolean containKeyWordInDoc(Document doc, List<String> keyWords) {

@@ -12,5 +12,5 @@ public interface ParserHtml{
 
 
 
-    String getSortedHtml(File file, List<String> keyWord) throws IOException;
+    List<Element> getSortedHtml(File file, List<String> keyWord) throws IOException;
 }

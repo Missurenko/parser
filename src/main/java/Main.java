@@ -15,9 +15,9 @@ import java.util.List;
 
 public class Main {
 
-    private static final String PATH_NAME = "/home/bm/Downloads/parser-master/html_file";
+    private static final String PATH_NAME = "C:\\Users\\User1\\IdeaProjects\\learnLua\\html_file";
 
-    private static final String PATH_WRITE = "/home/bm/Downloads/parser-master/result";
+    private static final String PATH_WRITE = "C:\\Users\\User1\\IdeaProjects\\learnLua\\result";
 
     private static final List<String> KEY_WORDS = Arrays.asList("Агуша", "агуша");
 
@@ -32,7 +32,7 @@ public class Main {
 
             Document doc = Jsoup.parse(file, "UTF-8");
             Element allElement = doc.getAllElements().first();
-            parserHtml.getSortedHtml(file, KEY_WORDS);
+//            parserHtml.getSortedHtml(file, KEY_WORDS);
 
             dto.Parser parser = new dto.Parser(allElement, KEY_WORDS, TAG_FILTER);
             Element parseredOrigin = parser.start();
