@@ -30,20 +30,20 @@ public class FileReadWriteHtmlImpl implements FileReadWriteHtml {
         Integer count = 0;
         File dirPath = new File(fullDirPathResult + "/" + count + "__" + nameDoc + ".html");
 
-            PrintStream out = null;
-            try {
-                out = new PrintStream(
-                        new BufferedOutputStream(
-                                new FileOutputStream(dirPath, true)));
-                out.println(parseredOrigin);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (out != null) {
-                    out.close();
-                }
+        PrintStream out = null;
+        try {
+            out = new PrintStream(
+                    new BufferedOutputStream(
+                            new FileOutputStream(dirPath, true)));
+            out.println(parseredOrigin);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (out != null) {
+                out.close();
             }
-            System.out.println("Writer : ");
+        }
+        System.out.println("Writer : ");
 
         return true;
 
@@ -62,6 +62,13 @@ public class FileReadWriteHtmlImpl implements FileReadWriteHtml {
         return result;
     }
 
+    @Override
+    public boolean delete(File file) {
+
+        file.delete();
+
+        return true;
+    }
 
 
 }

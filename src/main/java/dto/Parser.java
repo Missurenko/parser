@@ -27,6 +27,9 @@ public class Parser {
         this.filterTag = filterTag;
     }
 
+    public Parser() {
+    }
+
     public Element start() {
         recursiveMetod(element, 0);
         return element;
@@ -75,15 +78,8 @@ public class Parser {
 
 
                     Element childBranch;
-                    if (cloneDepth == 0) {
-                        childBranch = child.clone();
-
-                        recursiveMetodClone(childBranch, cloneDepth);
-                    } else {
-
-                        childBranch = child;
-                        recursiveMetodClone(childBranch, cloneDepth);
-                    }
+                    childBranch = child.clone();
+                    recursiveMetodClone(childBranch, cloneDepth);
                     clonesList.add(childBranch);
                     // до сюди
                 }
@@ -137,22 +133,24 @@ public class Parser {
                 deleteOrNot.add(false);
             }
         }
+
         int count = 0;
         for (Boolean isBe : deleteOrNot) {
             if (!isBe) {
                 count++;
             }
         }
-        return count > 1;
+        return count >= 1;
 
     }
 
     private List<Element> recursiveMetodDeleteAllChildNode(Element element, List<Element> listOneDepthElem) {
+        List<Element> supportListElem = element.children();
+        if (supportListElem.size() == 0) {
+            listOneDepthElem.add(element);
+        }
         for (Element child : element.children()) {
-            List<Element> supportListElem = child.children();
-            if (supportListElem.size() == 0) {
-                listOneDepthElem.add(element);
-            }
+
             String ss = "ss";
             List<Element> oneDepthElement = recursiveMetodDeleteAllChildNode(child, new ArrayList<>());
             if (oneDepthElement.size() > 0) {
@@ -244,7 +242,7 @@ public class Parser {
     }
 
     // use for doc in other location
-    private boolean containKeyWordInDoc(Document doc, List<String> keyWords) {
+    public boolean containKeyWordInDoc(Document doc, List<String> keyWords) {
         for (String keyWord : keyWords) {
             if (doc.text().contains(keyWord)) {
                 return true;

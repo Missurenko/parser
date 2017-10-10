@@ -19,7 +19,7 @@ public class Main {
 
     private static final String PATH_WRITE = "C:\\Users\\User1\\IdeaProjects\\learnLua\\result";
 
-    private static final List<String> KEY_WORDS = Arrays.asList("Донец");
+    private static final List<String> KEY_WORDS = Arrays.asList("Агуша", "агуша");
 
     private static final List<String> TAG_FILTER = Arrays.asList("script", "noscript", "style");
 
@@ -32,9 +32,14 @@ public class Main {
 
             Document doc = Jsoup.parse(file, "UTF-8");
             Element allElement = doc.getAllElements().first();
+            Parser parserForDeleteExample = new Parser();
+            if (parserForDeleteExample.containKeyWordInDoc(doc, KEY_WORDS)) {
+                fileReadWriteHtml.delete(file);
+                String ss = "ss";
+            }
 //            parserHtml.getSortedHtml(file, KEY_WORDS);
 
-            dto.Parser parser = new dto.Parser(allElement, KEY_WORDS, TAG_FILTER);
+            Parser parser = new Parser(allElement, KEY_WORDS, TAG_FILTER);
             Element parseredOrigin = parser.start();
             fileReadWriteHtml.writeToDir(parseredOrigin, PATH_WRITE, "first");
             System.out.printf("END");
