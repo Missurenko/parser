@@ -19,7 +19,7 @@ public class Main {
 
     private static final String PATH_WRITE = "C:\\Users\\User1\\IdeaProjects\\learnLua\\result";
 
-    private static final List<String> KEY_WORDS = Arrays.asList("Агуша", "агуша");
+    private static final List<String> KEY_WORDS = Arrays.asList("Донец");
 
     private static final List<String> TAG_FILTER = Arrays.asList("script", "noscript", "style");
 

@@ -40,6 +40,7 @@ public class Parser {
 
             flagDeleteOrNot.add(flag);
         }
+        String ss = "ss";
         for (int i = flagDeleteOrNot.size() - 1; i >= 0; --i) {
             if (flagDeleteOrNot.get(i)) {
                 mainElement.child(i).remove();
@@ -70,13 +71,16 @@ public class Parser {
                     !child.tag().toString().equals("html")) {
                 if (countKeyWordChild >= 2 |
                         countKeyWordChild >= 1 &
-                                noHaveDateFlag(child)) {
+                                !noHaveDateFlag(child)) {
+
+
                     Element childBranch;
                     if (cloneDepth == 0) {
                         childBranch = child.clone();
-                        cloneDepth++;
+
                         recursiveMetodClone(childBranch, cloneDepth);
                     } else {
+
                         childBranch = child;
                         recursiveMetodClone(childBranch, cloneDepth);
                     }
@@ -101,6 +105,9 @@ public class Parser {
                 mainElement.child(i).remove();
             }
         }
+
+// here write one more if
+
         if (doContinue) {
             for (Element child : mainElement.children()) {
                 recursiveMetod(child, cloneDepth);
