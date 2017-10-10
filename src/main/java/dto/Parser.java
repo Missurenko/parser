@@ -3,6 +3,7 @@ package dto;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
@@ -19,8 +20,6 @@ public class Parser {
     private List<String> keyWordList;
     private List<String> filterTag;
 
-    private int firstBlood;
-
 
     public Parser(Element element, List<String> keyWordList, List<String> filterTag) {
         this.element = element;
@@ -29,138 +28,132 @@ public class Parser {
     }
 
     public Element start() {
-        deleteMetod(element, 0);
+        recursiveMetod(element, 0);
         return element;
     }
 
-    private void deleteMetod(Element mainElement, int depthByOneMore) {
-        List<Boolean> flagWhatDelete = new ArrayList<>();
-        List<Element> elementsementWhatNoGoDeeper = new ArrayList<>();
+    private void deleteMetod(Element mainElement) {
+        List<Boolean> flagDeleteOrNot = new ArrayList<>();
+
         for (int i = 0; i < mainElement.children().size(); i++) {
-            boolean flag = getFlagByFilters(mainElement.child(i), mainElement);
-//            if (depthByOneMore > 5) {
-//                if (noNeedGoDeeper(mainElement) & flag) {
-//                    flag = false;
-//                    elementsementWhatNoGoDeeper.add(mainElement.child(i));
-//                }
-//            }
-            flagWhatDelete.add(flag);
+            boolean flag = getFlagDeleteByFilters(mainElement.child(i), mainElement);
+
+            flagDeleteOrNot.add(flag);
         }
-        for (int i = flagWhatDelete.size() - 1; i > 0; --i) {
-            if (flagWhatDelete.get(i)) {
+        for (int i = flagDeleteOrNot.size() - 1; i >= 0; --i) {
+            if (flagDeleteOrNot.get(i)) {
                 mainElement.child(i).remove();
                 System.out.printf("Remove");
             }
         }
+    }
 
+    private void recursiveMetod(Element mainElement, int cloneDepth) {
 
-        boolean flagDateResult = true;
+        deleteMetod(mainElement);
+        // змінити звітси
+
+        List<Element> clonesList = new ArrayList<>();
         for (Element child : mainElement.children()) {
+            int countKeyWordChild = 0;
 
+            for (Element childForCount : mainElement.children()) {
+                if (!noContainKeyWordInElement(childForCount, keyWordList)) {
+                    countKeyWordChild++;
+                }
+            }
+            if (!mainElement.tag().toString().equals("body") &
+                    !mainElement.tag().toString().equals("head") &
+                    !mainElement.tag().toString().equals("html") &
+                    !child.tag().toString().equals("body") &
+                    !child.tag().toString().equals("head") &
+                    !child.tag().toString().equals("html")) {
+                if (countKeyWordChild >= 2 |
+                        countKeyWordChild >= 1 &
+                                noHaveDateFlag(child)) {
+                    Element childBranch;
+                    if (cloneDepth == 0) {
+                        childBranch = child.clone();
+                        cloneDepth++;
+                        recursiveMetodClone(childBranch, cloneDepth);
+                    } else {
+                        childBranch = child;
+                        recursiveMetodClone(childBranch, cloneDepth);
+                    }
+                    clonesList.add(childBranch);
+                    // до сюди
+                }
 
-            boolean flagDate = dateFlagNoContain(child);
-            if (!flagDate) {
-                flagDateResult = false;
             }
         }
-        for (Element child : mainElement.children()) {
-            boolean goDepther = true;
-
+        List<Boolean> saveOrNot = new ArrayList<>();
+        for (Element cloneChild : clonesList) {
             String ss = "ss";
-            // змінити звітси
-            int countKeyWordChild = 0;
-            if (mainElement.children().size() == 1) {
-                for (Element oneStepChild : child.children()) {
-                    if (!noContainKeyWordInElement(oneStepChild, keyWordList)) {
-                        countKeyWordChild++;
-                    }
-                }
-                if (countKeyWordChild >= 2 &
-                        !child.tag().toString().equals("body") &
-                        !child.tag().toString().equals("head")) {
-                }
-
-                // до сюди
-                String sss = "ss";
-                if (goDepther)
-
-                {
-
-                    depthByOneMore++;
-                    System.out.println(depthByOneMore);
-                    deleteMetod(child, depthByOneMore);
-                }
+            saveOrNot.add(leaveItOrNot(cloneChild));
+        }
+        String sss = "ss";
+        boolean doContinue = true;
+        for (int i = saveOrNot.size() - 1; i >= 0; --i) {
+            String ssss = "ss";
+            if (saveOrNot.get(i)) {
+                doContinue = false;
+            } else {
+                mainElement.child(i).remove();
             }
-
+        }
+        if (doContinue) {
+            for (Element child : mainElement.children()) {
+                recursiveMetod(child, cloneDepth);
+            }
         }
     }
 
+    private void recursiveMetodClone(Element mainElement, int cloneDepth) {
+        deleteMetod(mainElement);
+        for (Element child : mainElement.children()) {
+            recursiveMetodClone(child, cloneDepth);
+        }
+    }
+
+    private boolean leaveItOrNot(Element cloneAndFiltered) {
+        List<Element> elementDepthOne = recursiveMetodDeleteAllChildNode(cloneAndFiltered, new ArrayList<>());
 
 
+        List<Boolean> deleteOrNot = new ArrayList<>();
+        String ss = "ss";
 
-//    // змінити звітси
-//    int countKeyWordChild = 0;
-//            if (mainElement.children().size() == 1) {
-//
-//        for (Element oneStepChild : child.children()) {
-//            if (!noContainKeyWordInElement(oneStepChild, keyWordList)) {
-//                countKeyWordChild++;
-//            }
-//        }
-//        if (countKeyWordChild >= 2 &
-//                !child.tag().toString().equals("body") &
-//                !child.tag().toString().equals("head")) {
-//
-//            List<Pattern> patterns = new ArrayList<>();
-//            for (String keyWord : keyWordList) {
-//                patterns.add(Pattern.compile(keyWord));
-//            }
-//            String ss = "ss";
-//            for (Pattern patternKeyWord : patterns) {
-//                for (Element oneStepChild : child.children()) {
-//                    if (!noContainKeyWordInElement(oneStepChild, keyWordList)) {
-//                        List<Element> elementsChild = oneStepChild.getElementsMatchingText(patternKeyWord);
-//
-//
-//                        for(Element element: elementsChild){
-//                            if(element.children().size() == 0&
-//                                    element.tag().toString().equals("href")){
-//                                String ssss = "ss";
-//                                for (String keyWord : keyWordList) {
-//                                    if(element.getElementsMatchingText(keyWord).size() == 1){
-//
-//                                    }
-//
-//                                }
-//
-//
-//                            }
-//                        }
-//
-//
-//                    }
-//
-//
-//                }
-//            }
-//
-//
-//        }
-//
-//
-//        if (
-//                !flagDateResult){
-//
-//            goDepther = false;
-//        }
-//
-//
-//    }
-//
-//    // до сюди
+        for (Element byOneDepthToEnd : elementDepthOne) {
+            String sss = "ss";
+            if (byOneDepthToEnd.tag().toString().equals("a")) {
+                deleteOrNot.add(true);
+            } else {
+                deleteOrNot.add(false);
+            }
+        }
+        int count = 0;
+        for (Boolean isBe : deleteOrNot) {
+            if (!isBe) {
+                count++;
+            }
+        }
+        return count > 1;
 
-    private boolean depth(Element element) {
-        return element.childNodeSize() != 0;
+    }
+
+    private List<Element> recursiveMetodDeleteAllChildNode(Element element, List<Element> listOneDepthElem) {
+        for (Element child : element.children()) {
+            List<Element> supportListElem = child.children();
+            if (supportListElem.size() == 0) {
+                listOneDepthElem.add(element);
+            }
+            String ss = "ss";
+            List<Element> oneDepthElement = recursiveMetodDeleteAllChildNode(child, new ArrayList<>());
+            if (oneDepthElement.size() > 0) {
+                listOneDepthElem.addAll(oneDepthElement);
+            }
+        }
+        String sss = "ss";
+        return listOneDepthElem;
     }
 
     // think and chenge
@@ -197,7 +190,7 @@ public class Parser {
         return true;
     }
 
-    private boolean getFlagByFilters(Element child, Element parant) {
+    private boolean getFlagDeleteByFilters(Element child, Element parant) {
         boolean flag = false;
         // if contain tag script,noscript, style
         for (String string : filterTag) {
@@ -212,14 +205,14 @@ public class Parser {
         } else {
             flag = noContainKeyWordInElement(child, keyWordList);
             if (flag) {
-                flag = dateFlagNoContain(child);
+                flag = noHaveDateFlag(child);
                 return flag;
             }
             return flag;
         }
     }
 
-    private boolean dateFlagNoContain(Element child) {
+    private boolean noHaveDateFlag(Element child) {
 
         List<Pattern> patternList = new ArrayList<>();
         // TODO find or do some more pattern this date
