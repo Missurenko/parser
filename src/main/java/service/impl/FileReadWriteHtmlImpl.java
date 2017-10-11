@@ -1,5 +1,7 @@
 package service.impl;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import service.FileReadWriteHtml;
 
@@ -20,15 +22,15 @@ public class FileReadWriteHtmlImpl implements FileReadWriteHtml {
     //и чтоб можно автоматически параметри
     //
     @Override
-    public List<File> readDir(String dirPathHtml) throws IOException {
+    public List<File> readDir(String dirPathHtml, List<String> keyWord) throws IOException {
         File htmlFile = new File(dirPathHtml);
-        return listFilesForFolder(htmlFile);
+        return listFilesForFolder(htmlFile, keyWord);
     }
 
     @Override
-    public boolean writeToDir(Element parseredOrigin, String fullDirPathResult, String nameDoc) {
+    public boolean writeToDir(Element parseredOrigin, String path, String nameDirTask, String nameDoc) {
         Integer count = 0;
-        File dirPath = new File(fullDirPathResult + "/" + count + "__" + nameDoc + ".html");
+        File dirPath = new File(path + "/" + count + "__" + nameDoc + ".html");
 
         PrintStream out = null;
         try {
@@ -50,14 +52,17 @@ public class FileReadWriteHtmlImpl implements FileReadWriteHtml {
     }
 
     // TODO Change metod give only 1 folder
-    private List<File> listFilesForFolder(final File folder) {
+    private List<File> listFilesForFolder(final File folder, List<String> keyWord) {
         List<File> result = new ArrayList<>();
         for (final File fileEntry : folder.listFiles()) {
-            if (fileEntry.isDirectory()) {
-                listFilesForFolder(fileEntry);
-            } else {
-                result.add(fileEntry);
+            Document doc = null;
+            try {
+                doc = Jsoup.parse(fileEntry, "UTF-8");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            if (containKeyWordInDoc(doc, keyWord))
+                result.add(fileEntry);
         }
         return result;
     }
@@ -70,5 +75,12 @@ public class FileReadWriteHtmlImpl implements FileReadWriteHtml {
         return true;
     }
 
-
+    public boolean containKeyWordInDoc(Document doc, List<String> keyWords) {
+        for (String keyWord : keyWords) {
+            if (doc.text().contains(keyWord)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

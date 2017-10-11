@@ -9,10 +9,17 @@ import org.jsoup.nodes.Element;
 
 public interface FileReadWriteHtml {
 
-    List<File> readDir(String dirPathHtml) throws IOException;
 
+    boolean writeToDir(Element parseredOrigin, String path, String nameDirTask, String nameDoc);
 
     boolean delete(File file);
 
-    boolean writeToDir(Element parseredOrigin, String fullDirPathResult, String nameDoc);
+    // delete child
+    // собрать обратно
+    //поток прикрутить
+    //и чтоб можно автоматически параметри
+    //
+    List<File> readDir(String dirPathHtml, List<String> keyWord) throws IOException;
+
+
 }
