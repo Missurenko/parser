@@ -22,16 +22,26 @@ public class FileReadWriteHtmlImpl implements FileReadWriteHtml {
     //и чтоб можно автоматически параметри
     //
     @Override
-    public List<File> readDir(String dirPathHtml, List<String> keyWord) throws IOException {
+    public List<File> readDir(String pathFromRead,String dirPathHtml, List<String> keyWord) throws IOException {
         File htmlFile = new File(dirPathHtml);
         return listFilesForFolder(htmlFile, keyWord);
     }
 
     @Override
     public boolean writeToDir(Element parseredOrigin, String path, String nameDirTask, String nameDoc) {
-        Integer count = 0;
-        File dirPath = new File(path + "/" + count + "__" + nameDoc + ".html");
 
+
+        String fullPathFolder = path.concat("/" + nameDirTask);
+        String fullPathFile = path.concat("/" + nameDirTask + "/" + nameDoc);
+
+        File directory = new File(fullPathFolder);
+        if (!directory.exists()) {
+            directory.mkdir();
+            // If you require it to make the entire directory path including parents,
+            // use directory.mkdirs(); here instead.
+        }
+
+        File dirPath = new File(fullPathFile);
         PrintStream out = null;
         try {
             out = new PrintStream(
