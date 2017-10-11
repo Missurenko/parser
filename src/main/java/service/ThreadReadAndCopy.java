@@ -23,19 +23,18 @@ public class ThreadReadAndCopy extends Thread {
     private String pathForWrite;
 
 
-    public ThreadReadAndCopy(String name, FileReadWriteHtml fileReadWrite, String pathFromRead, String pathForWrite) {
+    public ThreadReadAndCopy(String name, FileReadWriteHtml fileReadWrite, List<AllInformationAboutTaskDto> allInfoList, String pathFromRead, String pathForWrite) {
         super(name);
         this.fileReadWrite = fileReadWrite;
+        this.allInfoList = allInfoList;
         this.pathFromRead = pathFromRead;
         this.pathForWrite = pathForWrite;
-        ThreadReadAndCopy start = new ThreadReadAndCopy(name, fileReadWrite, pathFromRead, pathForWrite);
-        start.start();
+
     }
 
 
     public void run() {
         do {
-
             for (AllInformationAboutTaskDto info : allInfoList) {
                 String dirTask = info.getNameFolderTask();
                 try {
@@ -48,18 +47,11 @@ public class ThreadReadAndCopy extends Thread {
                 List<ElementFilteredDto> filteredElement = new ArrayList<>();
                 for (File html : info.getFilesForCopy()) {
                     Document doc = null;
-                    try {
-                        doc = Jsoup.parse(html, "UTF-8");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    ElementFilteredDto nameAndFilteredElem = new ElementFilteredDto();
-                    Element allElement = doc.getAllElements().first();
 
-                    Parser parser = new Parser(allElement, info.getKeyWords(), info.getTAG_FILTER());
-                    Element parseredOrigin = parser.start();
+                    ElementFilteredDto nameAndFilteredElem = new ElementFilteredDto();
+
                     nameAndFilteredElem.setFile(html);
-                    nameAndFilteredElem.setFilteredElement(parseredOrigin);
+               
                     filteredElement.add(nameAndFilteredElem);
 
                 }

@@ -21,6 +21,13 @@ public interface FileReadWriteHtml {
 
     boolean delete(File file);
 
+    List<String> readCfg();
+
+
+
+    List<String> readCfg0(String pathName);
+
+
     // delete child
     // собрать обратно
     //поток прикрутить

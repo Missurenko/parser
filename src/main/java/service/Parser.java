@@ -47,7 +47,7 @@ public class Parser {
         for (int i = flagDeleteOrNot.size() - 1; i >= 0; --i) {
             if (flagDeleteOrNot.get(i)) {
                 mainElement.child(i).remove();
-                System.out.printf("Remove");
+
             }
         }
     }

@@ -20,13 +20,13 @@ public class ThreadReadAndCopyForIngest extends Thread {
     private String pathForWrite;
 
 
-    public ThreadReadAndCopyForIngest(String name, FileReadWriteHtml fileReadWrite, String pathFromRead, String pathForWrite) {
+    public ThreadReadAndCopyForIngest(String name, FileReadWriteHtml fileReadWrite, List<AllInformationAboutTaskDto> allInfoList, String pathFromRead, String pathForWrite) {
         super(name);
         this.fileReadWrite = fileReadWrite;
+        this.allInfoList = allInfoList;
         this.pathFromRead = pathFromRead;
         this.pathForWrite = pathForWrite;
-        ThreadReadAndCopyForIngest start = new ThreadReadAndCopyForIngest(name, fileReadWrite, pathFromRead, pathForWrite);
-        start.start();
+
     }
 
 
@@ -36,7 +36,7 @@ public class ThreadReadAndCopyForIngest extends Thread {
             for (AllInformationAboutTaskDto info : allInfoList) {
                 String dirTask = info.getNameFolderTask();
                 try {
-                    info.setFilesForCopy(fileReadWrite.readDir(dirTask, info.getKeyWords()));
+                    info.setFilesForCopy(fileReadWrite.readDir(pathFromRead,dirTask, info.getKeyWords()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
