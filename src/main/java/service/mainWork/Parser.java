@@ -1,4 +1,4 @@
-package service;
+package service.mainWork;
 
 
 import org.jsoup.nodes.Document;
@@ -79,7 +79,7 @@ public class Parser {
 
                     Element childBranch;
                     childBranch = child.clone();
-                    recursiveMetodClone(childBranch, cloneDepth);
+                    recursiveMetodClone(childBranch);
                     clonesList.add(childBranch);
                     // до сюди
                 }
@@ -111,10 +111,10 @@ public class Parser {
         }
     }
 
-    private void recursiveMetodClone(Element mainElement, int cloneDepth) {
+    private void recursiveMetodClone(Element mainElement) {
         deleteMetod(mainElement);
         for (Element child : mainElement.children()) {
-            recursiveMetodClone(child, cloneDepth);
+            recursiveMetodClone(child);
         }
     }
 

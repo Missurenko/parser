@@ -3,6 +3,7 @@ package dto;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 public class AllInformationAboutTaskDto {
@@ -11,28 +12,32 @@ public class AllInformationAboutTaskDto {
     private List<String> keyWords;
     private String nameFolderTask;
 
-    private List<File> filesForCopy;
+    private List<ElementFilteredDto> nameFileAndFilteredElement;
+
+
+    private Map<String, File> filesForCopy;
     private final List<String> TAG_FILTER = Arrays.asList("script", "noscript", "style");
 
-    private List<ElementFilteredDto> nameAndFilteredElement;
 
-    public List<ElementFilteredDto> getNameAndFilteredElement() {
-        return nameAndFilteredElement;
+    public List<ElementFilteredDto> getNameFileAndFilteredElement() {
+        return nameFileAndFilteredElement;
     }
 
-    public void setNameAndFilteredElement(List<ElementFilteredDto> nameAndFilteredElement) {
-        this.nameAndFilteredElement = nameAndFilteredElement;
+    public void setNameFileAndFilteredElement(List<ElementFilteredDto> nameFileAndFilteredElement) {
+        this.nameFileAndFilteredElement = nameFileAndFilteredElement;
     }
 
-    public List<File> getFilesForCopy() {
-        return filesForCopy;
-    }
+
 
     public List<String> getTAG_FILTER() {
         return TAG_FILTER;
     }
 
-    public void setFilesForCopy(List<File> filesForCopy) {
+    public Map<String, File> getFilesForCopy() {
+        return filesForCopy;
+    }
+
+    public void setFilesForCopy(Map<String, File> filesForCopy) {
         this.filesForCopy = filesForCopy;
     }
 
@@ -59,4 +64,6 @@ public class AllInformationAboutTaskDto {
     public void setNameFolderTask(String nameFolderTask) {
         this.nameFolderTask = nameFolderTask;
     }
+
+
 }

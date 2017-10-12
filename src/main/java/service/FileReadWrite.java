@@ -4,10 +4,11 @@ package service;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.jsoup.nodes.Element;
 
-public interface FileReadWriteHtml {
+public interface FileReadWrite {
 
 
     // delete child
@@ -15,17 +16,18 @@ public interface FileReadWriteHtml {
     //поток прикрутить
     //и чтоб можно автоматически параметри
     //
-    List<File> readDir(String pathFromRead, String dirPathHtml, List<String> keyWord) throws IOException;
+    Map<String, File> readDir(Map<String, File> allFiles, String dirPathHtml, List<String> keyWord) throws IOException;
 
-    boolean writeToDir(Element parseredOrigin, String path, String nameDirTask, String nameDoc);
+    boolean writeToDir(Element parseredOrigin,String dirPathHtml, String nameDoc);
 
     boolean delete(File file);
 
-    List<String> readCfg();
 
 
 
-    List<String> readCfg0(String pathName);
+    List<String> readConfigByLine(String folder);
+
+    List<String> readConfigurationTxt(String pathName);
 
 
     // delete child
