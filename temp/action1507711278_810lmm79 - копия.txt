@@ -1,0 +1,210 @@
+[License]
+LicenseServerHost=10.24.1.220
+LicenseServerACIPort=20000
+LicenseServerTimeout=600000
+LicenseServerRetries=1
+
+[service]
+ServicePort=5682
+ServiceStatusClients=*
+ServiceControlClients=*
+
+[server]
+Port=5680
+QueryClients=*
+AdminClients=*
+
+//XSLTemplates=TRUE
+[Logging]
+LogLevel=FULL
+LogEcho=TRUE
+0=ApplicationLogStream
+1=ActionLogStream
+2=SynchronizeLogStream
+
+[ApplicationLogStream]
+LogFile=application.log
+LogTypeCSVs=application
+
+[ActionLogStream]
+LogFile=action.log
+LogTypeCSVs=action
+
+[SynchronizeLogStream]
+LogFile=synchronize.log
+LogTypeCSVs=synchronize
+
+[Connector]
+CleanOnStart=false
+//EnableIngestion=TRUE
+EnableScheduledTasks=TRUE
+ScheduleRepeatSecs=86400
+ScheduleCycles=-1
+ScheduleStartTime=NOW
+TaskThreads=3
+SynchronizeThreads=5
+
+[Ingestion]
+//EnableIngestion=TRUE
+IngesterType=CFS
+IngestHost=10.24.1.223
+IngestPort=7000
+EnableIngestion=TRUE
+
+//IngesterType=Indexer
+//IngestWriteIdx=TRUE
+[FetchTasks]
+SSLMethod=SSLV23
+Number=3
+0=example
+1=example1
+
+[example]
+Url=https://bin.ua/news/finance/finances/211816-mvf-uluchshil-ocenku-deficita-tekushhego-scheta.html
+//Url=http://odessamedia.net/search/?cx=partner-pub-4634339770824757%3A8332018978&cof=FORID%3A10&ie=UTF-8&q=%D0%BE%D0%B1%D1%89%D0%B5%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9+%D1%82%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D1%80%D1%82&sa=%D0%9F%D0%BE%D0%B8%D1%81%D0%BA
+// on_1
+// off і при on_5=2000 и on_4=50000, on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_2 знаходить 7 idx
+//SpiderUrlMustHaveRegex=.*news.*|.*search.*
+// on_2
+SpiderUrlCantHaveRegex=.*css.*|.*js.*
+// on_10
+Clipped=TRUE
+//ClipPageUsingCssSelect=div.one_news,div.float: left; width: 610px; padding-left: 5px; padding-right: 5px;
+ClipPageUsingCssUnselect=div.hdtb-msb
+//IgnoreCanonicalLinks=TRUE
+// при використанні on 1 та 2 знаходить 26 idx
+// on_3
+// При включенні on_3=(.*Общественный транспорт.*|.*городской транспорт.*|.*общественный транспорт.*)
+// on_1=(.*news.*|.*search.* ), on_2 знаходить нічого
+// on_3 change (.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+PageMustHaveRegex=.*Киев.*
+//on_7 change to 5
+PageDelay=5s
+//on_8 change to FALSE
+StayOnSite=FALSE
+// 0  в іншому прикладі
+SiteDuration=3600s
+// on_2, on_1 використанні
+// on_4 change 0 to 50
+// при on_4=50 знаходить 13 idx on_3 off
+// on_4 change 50 to 200
+// при on_4=200 знаходить 14 idx on_3 off
+// on_2, on_1 використанні
+// on_4 change 200 to 2000
+// при on_4=2000 знаходить 15 idx on_3 off
+// on_4 change 2000 to 5000
+// при on_4=5000 знаходить 15 idx on_3 off
+// on_4 change 5000 to 50000
+// при on_4=5000 и on_5=500 , on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_1=(.*news.*|.*search.* ), on_2 знаходить 3 idx
+MaxPages=50000
+MinPageSize=0
+MaxPageSize=0
+// on_5 base 0 work
+// on_5 change 0 to 50
+// при on_5=50 знаходить 0
+// on_5 change 50 to 200
+// при on_5=200 и on_4=2000, on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_1, on_2 знаходить 3 idx
+//on_5 change 200 to 500
+// при on_5=500 и on_4=2000, on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_1, on_2 знаходить 3 idx
+//on_5 change 500 to 2000 - need test
+// при on_5=2000 и on_4=50000, on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_1, on_2 знаходить 3 idx
+MaxLinksPerPage=2000
+FollowRobotProtocol=false
+SpiderAs=Autn-WKOOP
+// Depth= 0 work
+////on_6 change 1 to 3
+//// при on_4=50000 и on_5=2000 , on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_1=(.*news.*|.*search.* ), on_2 знаходить 13 idx
+// on_1 change to off change url to google знаходить 1 idx (04.10.2017 15:06)
+// Clipped=TRUE
+Depth=3
+FollowFlash=false
+ScheduleRepeatSecs=86400
+ScheduleCycles=-1
+//LinkAttributes=href
+LinkElementCantHaveRegex=.*script.*
+// було просто search
+IndexDatabase=atest_odessa_search_media
+IngestSharedPath=C:\Autonomy\WebConnector\missurenko_test_example
+//MaxPageAge=30 days
+ScheduleStartTime=now
+
+[example1]
+Url=https://bin.ua/news/finance/finances/211816-mvf-uluchshil-ocenku-deficita-tekushhego-scheta.html
+//Url=http://odessamedia.net/search/?cx=partner-pub-4634339770824757%3A8332018978&cof=FORID%3A10&ie=UTF-8&q=%D0%BE%D0%B1%D1%89%D0%B5%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9+%D1%82%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D1%80%D1%82&sa=%D0%9F%D0%BE%D0%B8%D1%81%D0%BA
+// on_1
+// off і при on_5=2000 и on_4=50000, on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_2 знаходить 7 idx
+//SpiderUrlMustHaveRegex=.*news.*|.*search.*
+// on_2
+SpiderUrlCantHaveRegex=.*css.*|.*js.*
+// on_10
+Clipped=TRUE
+//ClipPageUsingCssSelect=div.one_news,div.float: left; width: 610px; padding-left: 5px; padding-right: 5px;
+ClipPageUsingCssUnselect=div.hdtb-msb
+//IgnoreCanonicalLinks=TRUE
+// при використанні on 1 та 2 знаходить 26 idx
+// on_3
+// При включенні on_3=(.*Общественный транспорт.*|.*городской транспорт.*|.*общественный транспорт.*)
+// on_1=(.*news.*|.*search.* ), on_2 знаходить нічого
+// on_3 change (.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+PageMustHaveRegex=.*Агуша.*,.*агуша.*,
+//on_7 change to 5
+PageDelay=5s
+//on_8 change to FALSE
+StayOnSite=FALSE
+// 0  в іншому прикладі
+SiteDuration=3600s
+// on_2, on_1 використанні
+// on_4 change 0 to 50
+// при on_4=50 знаходить 13 idx on_3 off
+// on_4 change 50 to 200
+// при on_4=200 знаходить 14 idx on_3 off
+// on_2, on_1 використанні
+// on_4 change 200 to 2000
+// при on_4=2000 знаходить 15 idx on_3 off
+// on_4 change 2000 to 5000
+// при on_4=5000 знаходить 15 idx on_3 off
+// on_4 change 5000 to 50000
+// при on_4=5000 и on_5=500 , on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_1=(.*news.*|.*search.* ), on_2 знаходить 3 idx
+MaxPages=50000
+MinPageSize=0
+MaxPageSize=0
+// on_5 base 0 work
+// on_5 change 0 to 50
+// при on_5=50 знаходить 0
+// on_5 change 50 to 200
+// при on_5=200 и on_4=2000, on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_1, on_2 знаходить 3 idx
+//on_5 change 200 to 500
+// при on_5=500 и on_4=2000, on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_1, on_2 знаходить 3 idx
+//on_5 change 500 to 2000 - need test
+// при on_5=2000 и on_4=50000, on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_1, on_2 знаходить 3 idx
+MaxLinksPerPage=2000
+FollowRobotProtocol=false
+SpiderAs=Autn-WKOOP
+// Depth= 0 work
+////on_6 change 1 to 3
+//// при on_4=50000 и on_5=2000 , on_3=(.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
+// on_1=(.*news.*|.*search.* ), on_2 знаходить 13 idx
+// on_1 change to off change url to google знаходить 1 idx (04.10.2017 15:06)
+// Clipped=TRUE
+Depth=3
+FollowFlash=false
+ScheduleRepeatSecs=86400
+ScheduleCycles=-1
+//LinkAttributes=href
+LinkElementCantHaveRegex=.*script.*
+// було просто search
+IndexDatabase=atest_odessa_search_media
+IngestSharedPath=C:\Autonomy\WebConnector\missurenko_test_example1
+//MaxPageAge=30 days
+ScheduleStartTime=now

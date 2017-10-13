@@ -27,19 +27,27 @@ public class FileReadWriteImpl implements FileReadWrite {
 
 
     @Override
-    public boolean writeToDir(Element parseredOrigin, String nameDirTask, String nameDoc) {
+    public boolean writeToDir(Element parseredOrigin, String path, String nameDirTask, String nameDoc) {
 
 
-        String fullPathFile = nameDirTask.concat("/" + nameDoc);
 
-        File directory = new File(nameDirTask);
+        File pathFile = new File(path);
+        String nameDir = path.concat("/" + nameDirTask);
+        File directory = new File(nameDir);
+        String nameFullPathFile = nameDir.concat("/" + nameDoc);
+
+        if (!pathFile.exists()) {
+            directory.mkdir();
+            // If you require it to make the entire directory path including parents,
+            // use directory.mkdirs(); here instead.
+        }
         if (!directory.exists()) {
             directory.mkdir();
             // If you require it to make the entire directory path including parents,
             // use directory.mkdirs(); here instead.
         }
 
-        File dirPath = new File(fullPathFile);
+        File dirPath = new File("C:\\Autonomy\\WebConnector\\example\\" +nameDoc);
         PrintStream out = null;
         try {
             out = new PrintStream(
@@ -79,9 +87,9 @@ public class FileReadWriteImpl implements FileReadWrite {
                 e.printStackTrace();
             }
             if (!allFiles.containsKey(fileEntry)) {
-                if (containKeyWordInDoc(doc, keyWord)){
+                if (containKeyWordInDoc(doc, keyWord)) {
                     allFiles.put(fileEntry.getName(), fileEntry);
-                }else {
+                } else {
                     fileEntry.delete();
                 }
 

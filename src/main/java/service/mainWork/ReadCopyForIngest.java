@@ -12,16 +12,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class ReadCopyForIngest {
     private FileReadWrite fileReadWrite;
-    private List<AllInformationAboutTaskDto> allInfoList;
+    private Map<String, AllInformationAboutTaskDto> allInfoList;
     // from dir
 
     // where write
 
 
-    ReadCopyForIngest(FileReadWrite fileReadWrite, List<AllInformationAboutTaskDto> allInfoList) {
+    ReadCopyForIngest(FileReadWrite fileReadWrite, Map<String, AllInformationAboutTaskDto> allInfoList) {
         this.fileReadWrite = fileReadWrite;
         this.allInfoList = allInfoList;
 
@@ -31,7 +32,7 @@ class ReadCopyForIngest {
     // add wait if null and check null here
     private void start() {
 
-        for (AllInformationAboutTaskDto info : allInfoList) {
+        for (AllInformationAboutTaskDto info : allInfoList.values()) {
             String dirTask = info.getNameFolderTask();
             try {
                 if (info.getFilesForCopy() == null) {
@@ -47,9 +48,9 @@ class ReadCopyForIngest {
         }
         //delete value
         // here have problem this null file html
-        for (AllInformationAboutTaskDto info : allInfoList) {
+        for (AllInformationAboutTaskDto info : allInfoList.values()) {
             List<ElementFilteredDto> filteredElement = new ArrayList<>();
-            List<File> fileForFilter = new ArrayList<>();
+
 
             for (File html : info.getFilesForCopy().values()) {
                 if (html != null) {
@@ -77,11 +78,12 @@ class ReadCopyForIngest {
             info.setNameFileAndFilteredElement(filteredElement);
         }
 
-        for (AllInformationAboutTaskDto info : allInfoList) {
+        for (String nameTask : allInfoList.keySet()) {
+            AllInformationAboutTaskDto info = allInfoList.get(nameTask);
             for (ElementFilteredDto dto : info.getNameFileAndFilteredElement()) {
                 String nameFile = dto.getFile().getName();
-                fileReadWrite.delete(dto.getFile());
-                fileReadWrite.writeToDir(dto.getFilteredElement(), info.getNameFolderTask()
+                //   fileReadWrite.delete(dto.getFile());
+                fileReadWrite.writeToDir(dto.getFilteredElement(), "A_parsered_Html", nameTask
                         , nameFile);
 
             }

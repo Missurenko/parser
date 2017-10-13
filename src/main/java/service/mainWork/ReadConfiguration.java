@@ -14,9 +14,8 @@ public class ReadConfiguration {
         FileReadWrite fileReadWrite = new FileReadWriteImpl();
 
         Map<String, AllInformationAboutTaskDto> listForFilter = readConfigurationFile(fileReadWrite);
-        List<AllInformationAboutTaskDto> result = new ArrayList<>();
-        result.addAll(listForFilter.values());
-        ReadCopyForIngest readAndIngest = new ReadCopyForIngest(fileReadWrite, result);
+
+        ReadCopyForIngest readAndIngest = new ReadCopyForIngest(fileReadWrite, listForFilter);
     }
 
     private Map<String, AllInformationAboutTaskDto> readConfigurationFile(FileReadWrite fileReadWrite) {
@@ -24,7 +23,7 @@ public class ReadConfiguration {
         String path = new File(".").getAbsolutePath();
         System.getProperty("user.dir");
 
-        List<String> configList = fileReadWrite.readConfigByLine("tt");
+        List<String> configList = fileReadWrite.readConfigByLine("temp");
 
         String captionConfig = "License";
         String nameTask = "null";

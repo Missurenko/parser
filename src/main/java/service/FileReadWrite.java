@@ -18,7 +18,7 @@ public interface FileReadWrite {
     //
     Map<String, File> readDir(Map<String, File> allFiles, String dirPathHtml, List<String> keyWord) throws IOException;
 
-    boolean writeToDir(Element parseredOrigin,String dirPathHtml, String nameDoc);
+    boolean writeToDir( Element parseredOrigin,String path, String dirPathHtml, String nameDoc);
 
     boolean delete(File file);
 

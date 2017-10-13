@@ -61,6 +61,13 @@ public class Parser {
         for (Element child : mainElement.children()) {
             int countKeyWordChild = 0;
 
+            Element mainBranch;
+            mainBranch = mainElement.clone();
+
+            if(!leaveItOrNot(mainBranch)){
+                mainElement.remove();
+            }
+
             for (Element childForCount : mainElement.children()) {
                 if (!noContainKeyWordInElement(childForCount, keyWordList)) {
                     countKeyWordChild++;
@@ -76,9 +83,9 @@ public class Parser {
                         countKeyWordChild >= 1 &
                                 !noHaveDateFlag(child)) {
 
-
                     Element childBranch;
                     childBranch = child.clone();
+
                     recursiveMetodClone(childBranch);
                     clonesList.add(childBranch);
                     // до сюди
