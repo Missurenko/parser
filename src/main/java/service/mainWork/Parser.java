@@ -1,13 +1,15 @@
 package service.mainWork;
 
 
+import dto.BooleanDto;
+import dto.Tree;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 
@@ -31,7 +33,7 @@ public class Parser {
     }
 
     public Element start() {
-        recursiveMetod(element, 0);
+        recursiveMetod(element);
         return element;
     }
 
@@ -52,9 +54,39 @@ public class Parser {
         }
     }
 
-    private void recursiveMetod(Element mainElement, int cloneDepth) {
+    private void shortRecursive(Element mainElement) {
 
         deleteMetod(mainElement);
+        for (Element child : mainElement.children()) {
+            shortRecursive(child);
+        }
+    }
+
+    private void recursiveMetod(Element mainElement) {
+
+
+        List<BooleanDto> booleanDtoChilds = new ArrayList<>();
+        List<Boolean> noGoDepeer = new ArrayList<>();
+        List<Boolean> saveOrNot = new ArrayList<>();
+        for (Element child : mainElement.children()) {
+            if (child.tag().toString().equals("footer") |
+                    child.tag().toString().equals("head") |
+                    child.tag().toString().equals("header")) {
+                shortRecursive(child);
+                noGoDepeer.add(true);
+
+            } else {
+                String ss = "ss";
+                //вклинить byTag
+            }
+        }
+//        BooleanDto childDto = booleanMetodGlobal(child);
+//        booleanDtoChilds.add(childDto);
+//        noGoDepeer.add(false);
+//        BooleanDto booleanDtoParant = booleanMetodGlobal(mainElement);
+//        List<Boolean> whatDelete = flagForDalete(booleanDtoParant, booleanDtoChilds, mainElement);
+
+//        deleteMetod(mainElement);
         // змінити звітси
 
         List<Element> clonesList = new ArrayList<>();
@@ -64,7 +96,7 @@ public class Parser {
             Element mainBranch;
             mainBranch = mainElement.clone();
 
-            if(!leaveItOrNot(mainBranch)){
+            if (!leaveItOrNot(mainBranch)) {
                 mainElement.remove();
             }
 
@@ -93,7 +125,7 @@ public class Parser {
 
             }
         }
-        List<Boolean> saveOrNot = new ArrayList<>();
+
         for (Element cloneChild : clonesList) {
             String ss = "ss";
             saveOrNot.add(leaveItOrNot(cloneChild));
@@ -113,10 +145,91 @@ public class Parser {
 
         if (doContinue) {
             for (Element child : mainElement.children()) {
-                recursiveMetod(child, cloneDepth);
+                recursiveMetod(child);
             }
         }
     }
+
+    private List<Boolean> flagForDalete(BooleanDto booleanDtoParant, List<BooleanDto> booleanDtoChildList, Element mainElement) {
+        List<Boolean> result = new ArrayList<>();
+        int lenght = 0;
+        int potion = 0;
+        for (int i = 0; i < booleanDtoChildList.size(); i++) {
+            BooleanDto child = booleanDtoChildList.get(i);
+            if (lenght < child.getTextLenght()) {
+                lenght = child.getTextLenght();
+                potion = i;
+            }
+        }
+        if (potion != 0) {
+            BooleanDto moreTextThenOther = booleanDtoChildList.get(potion);
+
+            result.set(potion, false);
+        }
+
+
+        return result;
+    }
+
+    private BooleanDto booleanMetodGlobal(Element mainElement) {
+        BooleanDto booleanDto = new BooleanDto();
+
+        if (mainElement.tag().toString().equals("head")) {
+            booleanDto.setDeleteOrNot(false);
+        }
+        booleanDto.setContainH1(containH1Orh2(mainElement));
+        booleanDto.setContaineImage(containeImage(mainElement));
+        booleanDto.setContainIframeVideo(containIframeVideo(mainElement));
+        if (!noHaveDateFlag(mainElement)) {
+            booleanDto.setContainDate(true);
+        }
+        countForBoolen(mainElement, booleanDto);
+        booleanDto.setTextLenght(mainElement.text().length());
+        return booleanDto;
+    }
+
+
+    private boolean containH1Orh2(Element element) {
+        return element.getElementsByTag("h1").size() != 0 |
+                element.getElementsByTag("h2").size() != 0;
+    }
+
+    private boolean containeImage(Element element) {
+        return element.getElementsByTag("img").size() != 0;
+    }
+
+    private boolean containIframeVideo(Element element) {
+        return element.getElementsByTag("iframe").size() != 0;
+    }
+
+    private void countForBoolen(Element element, BooleanDto booleanDto) {
+
+        Element clone = element.clone();
+        List<Element> elementDepthOne = recursiveMetodDeleteAllChildNode(clone, new ArrayList<>());
+        int countTagA = 0;
+        int countTextKeyWord = 0;
+        int containText = 0;
+
+        for (Element byOneDepthToEnd : elementDepthOne) {
+
+            if (byOneDepthToEnd.tag().toString().equals("a")) {
+                countTagA++;
+            } else {
+                if (!Objects.equals(byOneDepthToEnd.text(), "")) {
+                    containText++;
+                }
+            }
+            for (String keyWord : keyWordList) {
+                if (byOneDepthToEnd.text().contains(keyWord)) {
+                    countTextKeyWord++;
+                }
+            }
+        }
+        booleanDto.setCountTagA(countTagA);
+        booleanDto.setCountTextBy1Depth0(containText);
+        booleanDto.setCountTextKeyWord(countTextKeyWord);
+    }
+
 
     private void recursiveMetodClone(Element mainElement) {
         deleteMetod(mainElement);
@@ -125,8 +238,13 @@ public class Parser {
         }
     }
 
-    private boolean leaveItOrNot(Element cloneAndFiltered) {
-        List<Element> elementDepthOne = recursiveMetodDeleteAllChildNode(cloneAndFiltered, new ArrayList<>());
+//    private boolean leaveCss(Element child) {
+//        return child.getElementsByTag("link").size() != 0;
+//    }
+
+    // delete
+    private boolean leaveItOrNot(Element clone) {
+        List<Element> elementDepthOne = recursiveMetodDeleteAllChildNode(clone, new ArrayList<>());
 
 
         List<Boolean> deleteOrNot = new ArrayList<>();
@@ -168,42 +286,9 @@ public class Parser {
         return listOneDepthElem;
     }
 
-    // think and chenge
-    private boolean noNeedGoDeeper(Element parant) {
-        if (!noContainKeyWordInElement(parant, keyWordList)) {
-            for (int i = 0; i < parant.children().size(); i++) {
-                for (int j = 0; j < parant.children().size(); j++) {
-                    Element elementA = parant.child(i);
-                    Element elementB = parant.child(j);
-                    if (elementA.tag().toString().
-                            equals(elementB.tag().toString())
-                            & !elementA.text().equals(elementB.text())
-                            & !noContainKeyWordInElement(parant.child(j), keyWordList)
-                            & getParant(parant.child(i))) {
-
-                        String ss = "ss";
-                        return true;
-                    }
-
-                }
-
-            }
-        }
-        return false;
-    }
-
-    private boolean getParant(Element child) {
-
-        for (int i = 0; i < 4; i++) {
-            if (child.parents().size() == 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    // delete
     private boolean getFlagDeleteByFilters(Element child, Element parant) {
-        boolean flag = false;
+        boolean flag = true;
         // if contain tag script,noscript, style
         for (String string : filterTag) {
             if (child.tag().toString().equals(string)) {
@@ -213,15 +298,9 @@ public class Parser {
         // if contain css
         if (child.tag().toString().equals("link")) {
             return false;
-// what we need by keyWord
-        } else {
-            flag = noContainKeyWordInElement(child, keyWordList);
-            if (flag) {
-                flag = noHaveDateFlag(child);
-                return flag;
-            }
-            return flag;
         }
+// what we need by keyWord
+        return flag;
     }
 
     private boolean noHaveDateFlag(Element child) {
@@ -230,6 +309,8 @@ public class Parser {
         // TODO find or do some more pattern this date
         Pattern pattern0 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)");
         Pattern pattern1 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]).(0?[1-9]|1[012]).((19|20)\\d\\d)");
+        Pattern pattern2 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]) ([^\\s]) ((19|20)\\d\\d)");
+
         patternList.add(pattern0);
         patternList.add(pattern1);
         //Here we find all document elements which have some element with the searched pattern

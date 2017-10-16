@@ -1,6 +1,6 @@
 package service.impl;
 
-import org.apache.commons.io.FileUtils;
+//import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -47,7 +47,8 @@ public class FileReadWriteImpl implements FileReadWrite {
             // use directory.mkdirs(); here instead.
         }
 
-        File dirPath = new File("C:\\Autonomy\\WebConnector\\example\\" +nameDoc);
+//        File dirPath = new File("C:\\Autonomy\\WebConnector\\example\\" +nameDoc);
+                File dirPath = new File("/home/bm/Downloads/parser-master/result" +nameDoc);
         PrintStream out = null;
         try {
             out = new PrintStream(
@@ -168,17 +169,17 @@ public class FileReadWriteImpl implements FileReadWrite {
     public List<String> readConfigurationTxt(String folder) {
 
         List<String> lines = null;
-        try {
-
-            File folderFile = new File(folder);
-            String fullPath = fileConfigFullPath(folderFile).getAbsolutePath();
-            File file = new File(fullPath);
-
-            lines = FileUtils.readLines(file, "UTF-8");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//
+//            File folderFile = new File(folder);
+//            String fullPath = fileConfigFullPath(folderFile).getAbsolutePath();
+//            File file = new File(fullPath);
+//
+////            lines = FileUtils.readLines(file, "UTF-8");
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         return lines;
     }
 
