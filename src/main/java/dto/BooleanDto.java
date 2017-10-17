@@ -26,12 +26,22 @@ public class BooleanDto {
 
     private int countTextKeyWord;
 
-    private int containTextInATag;
+    private int lenghtTextInATag;
+
+    private int keyWordInTagA;
 
     private boolean deleteOrNot;
 
     public boolean isDeleteOrNot() {
         return deleteOrNot;
+    }
+
+    public int getKeyWordInTagA() {
+        return keyWordInTagA;
+    }
+
+    public void setKeyWordInTagA(int keyWordInTagA) {
+        this.keyWordInTagA = keyWordInTagA;
     }
 
     public void setDeleteOrNot(boolean deleteOrNot) {
@@ -119,11 +129,11 @@ public class BooleanDto {
         this.textLenght = textLenght;
     }
 
-    public int getContainTextInATag() {
-        return containTextInATag;
+    public int getLenghtTextInATag() {
+        return lenghtTextInATag;
     }
 
-    public void setContainTextInATag(int containTextInATag) {
-        this.containTextInATag = containTextInATag;
+    public void setLenghtTextInATag(int containTextInATag) {
+        this.lenghtTextInATag = containTextInATag;
     }
 }

@@ -2,7 +2,6 @@ package service.mainWork;
 
 
 import dto.BooleanDto;
-import dto.Tree;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -200,11 +199,16 @@ public class Parser {
                                                 booleanDtoParant, List<BooleanDto> booleanDtoChildList, Element mainElement) {
         List<Boolean> result = new ArrayList<>();
         int lenght = 0;
+        int lenghtTagA = 0;
+        int lenghtClearText = 0;
+
         int potion = -1;
         for (int i = 0; i < booleanDtoChildList.size(); i++) {
             BooleanDto child = booleanDtoChildList.get(i);
-            if (lenght < child.getTextLenght()) {
-                lenght = child.getTextLenght();
+            lenght = child.getTextLenght();
+            lenghtTagA = child.getLenghtTextInATag();
+            if (lenghtClearText < cleanText(lenght, lenghtTagA)) {
+                lenghtClearText = cleanText(lenght, lenghtTagA);
                 potion = i;
             }
             result.add(true);
@@ -214,22 +218,37 @@ public class Parser {
             moreTextThenOther = booleanDtoChildList.get(potion);
 
         }
-        if (booleanDtoParant.getCountTextKeyWord() > 0 &
-                booleanDtoParant.isContainH1() &
-                moreTextThenOther.getCountTextKeyWord() > 0 &
-                moreTextThenOther.isContainH1()) {
-            result.set(potion, false);
-        } else {
-            // maybe need first item shut down
-            for (int i = 0; i < potion + 1; i++) {
-                result.set(i, false);
+        if (booleanDtoParant.getCountTextKeyWord() > 0) {
+            if (booleanDtoParant.isContainH1() &
+                    moreTextThenOther.getCountTextKeyWord() > 0 &
+                    moreTextThenOther.isContainH1()) {
+                result.set(potion, false);
+            } else if (moreTextThenOther.getLenghtTextInATag() >
+                    moreTextThenOther.getTextLenght()) {
+                result.set(potion, true);
+            } else {
+                // maybe need first item shut down
+                for (int i = 0; i < potion + 1; i++) {
+                    result.set(i, false);
+                }
+                if (result.size() > potion + 1) {
+                    result.set(potion + 1, false);
+                }
+                for (int i = potion + 2; i < booleanDtoChildList.size(); i++) {
+                    if (cleanText(booleanDtoChildList.get(i).getTextLenght(),
+                            booleanDtoChildList.get(i).getLenghtTextInATag()) > 0) {
+                        result.set(i, false);
+                    } else {
+                        break;
+                    }
+                }
             }
-            if (result.size() > potion + 1) {
-                result.set(potion + 1, false);
-            }
-
         }
         return result;
+    }
+
+    private int cleanText(int lenghtAllText, int lenghtTextTagA) {
+        return lenghtAllText - lenghtTextTagA;
     }
 
     private BooleanDto booleanMetodGlobal(Element mainElement) {
@@ -271,12 +290,16 @@ public class Parser {
         int countTagA = 0;
         int countTextKeyWord = 0;
         int containText = 0;
-        int containTextInATagLenght = 0;
+        int keyWordInTagA = 0;
+        int lenghtTextInATagLenght = 0;
         for (Element byOneDepthToEnd : elementDepthOne) {
 
             if (byOneDepthToEnd.tag().toString().equals("a")) {
-                containTextInATagLenght += byOneDepthToEnd.text().length();
+                lenghtTextInATagLenght += byOneDepthToEnd.text().length();
                 countTagA++;
+                if (containKeyWord(byOneDepthToEnd)) {
+                    keyWordInTagA++;
+                }
             } else {
                 if (!Objects.equals(byOneDepthToEnd.text(), "")) {
                     Pattern pattern2 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]) ([^\\s]) ((19|20)\\d\\d)");
@@ -294,7 +317,7 @@ public class Parser {
         booleanDto.setCountTagA(countTagA);
         booleanDto.setCountTextBy1Depth0(containText);
         booleanDto.setCountTextKeyWord(countTextKeyWord);
-        booleanDto.setContainTextInATag(containTextInATagLenght);
+        booleanDto.setLenghtTextInATag(lenghtTextInATagLenght);
     }
 
     // think delete
