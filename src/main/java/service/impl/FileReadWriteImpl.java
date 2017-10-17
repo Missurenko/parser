@@ -48,7 +48,7 @@ public class FileReadWriteImpl implements FileReadWrite {
         }
 
 //        File dirPath = new File("C:\\Autonomy\\WebConnector\\example\\" +nameDoc);
-                File dirPath = new File("/home/bm/Downloads/parser-master/result" +nameDoc);
+                File dirPath = new File("C:\\Autonomy\\WebConnector\\example\\" +nameDoc);
         PrintStream out = null;
         try {
             out = new PrintStream(
