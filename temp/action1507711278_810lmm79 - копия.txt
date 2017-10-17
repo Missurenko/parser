@@ -130,6 +130,6 @@ ScheduleCycles=-1
 LinkElementCantHaveRegex=.*script.*
 // було просто search
 IndexDatabase=atest_odessa_search_media
-IngestSharedPath=/home/bm/Downloads/parser-master/example
+IngestSharedPath=C:\Users\User1\IdeaProjects\learnLua\html_file
 //MaxPageAge=30 days
 ScheduleStartTime=now

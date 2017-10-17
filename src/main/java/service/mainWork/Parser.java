@@ -54,6 +54,16 @@ public class Parser {
         }
     }
 
+    private void deleteOnly(Element mainElement, List<Boolean> whatDelete) {
+        for (int i = whatDelete.size() - 1; i >= 0; --i) {
+            if (whatDelete.get(i)) {
+                mainElement.child(i).remove();
+
+            }
+        }
+    }
+
+
     private void shortRecursive(Element mainElement) {
 
         deleteMetod(mainElement);
@@ -63,111 +73,162 @@ public class Parser {
     }
 
     private void recursiveMetod(Element mainElement) {
-
-
-        List<BooleanDto> booleanDtoChilds = new ArrayList<>();
-        List<Boolean> noGoDepeer = new ArrayList<>();
-        List<Boolean> saveOrNot = new ArrayList<>();
+        List<Boolean> deleteBlockList = new ArrayList<>();
         for (Element child : mainElement.children()) {
-            if (child.tag().toString().equals("footer") |
-                    child.tag().toString().equals("head") |
-                    child.tag().toString().equals("header")) {
-                shortRecursive(child);
-                noGoDepeer.add(true);
-
+            if (mainElement.tag().toString().equals("body") &
+                    child.tag().toString().equals("header") |
+                    mainElement.tag().toString().equals("body") &
+                            child.tag().toString().equals("footer")) {
+                deleteBlockList.add(true);
+            } else if (flagDeleteNoNeedTags(child)) {
+                deleteBlockList.add(true);
             } else {
-                String ss = "ss";
-                //вклинить byTag
+                deleteBlockList.add(false);
+            }
+            if (child.tag().toString().equals("head")) {
+                shortRecursive(child);
+            }
+
+        }
+
+
+        deleteOnly(mainElement, deleteBlockList);
+
+        List<Boolean> whatDelete = new ArrayList<>();
+        BooleanDto booleanDtoParant = booleanMetodGlobal(mainElement);
+        if (mainElement.children().size() > 1) {
+            if (!mainElement.tag().toString().equals("head") &
+                    !mainElement.tag().toString().equals("html") &
+                    !mainElement.tag().toString().equals("#root")) {
+                List<BooleanDto> booleanDtoChilds = new ArrayList<>();
+                for (Element child : mainElement.children()) {
+
+                    BooleanDto childDto = booleanMetodGlobal(child);
+                    booleanDtoChilds.add(childDto);
+                }
+
+
+                whatDelete = flagForDalete(booleanDtoParant, booleanDtoChilds, mainElement);
+
             }
         }
-//        BooleanDto childDto = booleanMetodGlobal(child);
-//        booleanDtoChilds.add(childDto);
-//        noGoDepeer.add(false);
-//        BooleanDto booleanDtoParant = booleanMetodGlobal(mainElement);
-//        List<Boolean> whatDelete = flagForDalete(booleanDtoParant, booleanDtoChilds, mainElement);
+
+        deleteOnly(mainElement, whatDelete);
+        int countForEnd = 0;
+        for (Element child : mainElement.children()) {
+            if (!child.tag().toString().equals("head")) {
+                countForEnd++;
+            }
+        }
 
 //        deleteMetod(mainElement);
         // змінити звітси
 
-        List<Element> clonesList = new ArrayList<>();
-        for (Element child : mainElement.children()) {
-            int countKeyWordChild = 0;
+//        List<Element> clonesList = new ArrayList<>();
+//        for (Element child : mainElement.children()) {
+//            int countKeyWordChild = 0;
+//
+//            Element mainBranch;
+//            mainBranch = mainElement.clone();
+//
+//            if (!leaveItOrNot(mainBranch)) {
+//                mainElement.remove();
+//            }
+//
+//            for (Element childForCount : mainElement.children()) {
+//                if (!noContainKeyWordInElement(childForCount, keyWordList)) {
+//                    countKeyWordChild++;
+//                }
+//            }
+//            if (!mainElement.tag().toString().equals("body") &
+//                    !mainElement.tag().toString().equals("head") &
+//                    !mainElement.tag().toString().equals("html") &
+//                    !child.tag().toString().equals("body") &
+//                    !child.tag().toString().equals("head") &
+//                    !child.tag().toString().equals("html")) {
+//                if (countKeyWordChild >= 2 |
+//                        countKeyWordChild >= 1 &
+//                                !noHaveDateFlag(child)) {
+//
+//                    Element childBranch;
+//                    childBranch = child.clone();
+//
+//                    recursiveMetodClone(childBranch);
+//                    clonesList.add(childBranch);
+//                    // до сюди
+//                }
+//
+//            }
+//        }
 
-            Element mainBranch;
-            mainBranch = mainElement.clone();
-
-            if (!leaveItOrNot(mainBranch)) {
-                mainElement.remove();
-            }
-
-            for (Element childForCount : mainElement.children()) {
-                if (!noContainKeyWordInElement(childForCount, keyWordList)) {
-                    countKeyWordChild++;
-                }
-            }
-            if (!mainElement.tag().toString().equals("body") &
-                    !mainElement.tag().toString().equals("head") &
-                    !mainElement.tag().toString().equals("html") &
-                    !child.tag().toString().equals("body") &
-                    !child.tag().toString().equals("head") &
-                    !child.tag().toString().equals("html")) {
-                if (countKeyWordChild >= 2 |
-                        countKeyWordChild >= 1 &
-                                !noHaveDateFlag(child)) {
-
-                    Element childBranch;
-                    childBranch = child.clone();
-
-                    recursiveMetodClone(childBranch);
-                    clonesList.add(childBranch);
-                    // до сюди
-                }
-
-            }
-        }
-
-        for (Element cloneChild : clonesList) {
-            String ss = "ss";
-            saveOrNot.add(leaveItOrNot(cloneChild));
-        }
-        String sss = "ss";
-        boolean doContinue = true;
-        for (int i = saveOrNot.size() - 1; i >= 0; --i) {
-            String ssss = "ss";
-            if (saveOrNot.get(i)) {
-                doContinue = false;
-            } else {
-                mainElement.child(i).remove();
-            }
-        }
-
-// here write one more if
-
-        if (doContinue) {
+//        for (Element cloneChild : clonesList) {
+//            String ss = "ss";
+//            saveOrNot.add(leaveItOrNot(cloneChild));
+//        }
+//        String sss = "ss";
+//        boolean doContinue = true;
+//        for (int i = saveOrNot.size() - 1; i >= 0; --i) {
+//            String ssss = "ss";
+//            if (saveOrNot.get(i)) {
+//                doContinue = false;
+//            } else {
+//                mainElement.child(i).remove();
+//            }
+//        }
+        if (countForEnd < 2) {
             for (Element child : mainElement.children()) {
-                recursiveMetod(child);
+                if (!child.tag().toString().equals("head")) {
+                    recursiveMetod(child);
+                }
             }
         }
+
+        if (mainElement.tag().toString().equals("html")) {
+            if (!containKeyWord(mainElement)) {
+                element = null;
+            }
+        }
+
+//        for (int i = 0; i < goMoreDeep.size(); i++) {
+//            if (goMoreDeep.get(i)) {
+//                recursiveMetod(mainElement.child(i));
+//            }
+//        }
     }
 
-    private List<Boolean> flagForDalete(BooleanDto booleanDtoParant, List<BooleanDto> booleanDtoChildList, Element mainElement) {
+    private List<Boolean> flagForDalete(BooleanDto
+                                                booleanDtoParant, List<BooleanDto> booleanDtoChildList, Element mainElement) {
         List<Boolean> result = new ArrayList<>();
         int lenght = 0;
-        int potion = 0;
+        int potion = -1;
         for (int i = 0; i < booleanDtoChildList.size(); i++) {
             BooleanDto child = booleanDtoChildList.get(i);
             if (lenght < child.getTextLenght()) {
                 lenght = child.getTextLenght();
                 potion = i;
             }
+            result.add(true);
         }
-        if (potion != 0) {
-            BooleanDto moreTextThenOther = booleanDtoChildList.get(potion);
+        BooleanDto moreTextThenOther = new BooleanDto();
+        if (potion != -1) {
+            moreTextThenOther = booleanDtoChildList.get(potion);
 
+        }
+        if (booleanDtoParant.getCountTextKeyWord() > 0 &
+                booleanDtoParant.isContainH1() &
+                moreTextThenOther.getCountTextKeyWord() > 0 &
+                moreTextThenOther.isContainH1()) {
             result.set(potion, false);
+        } else {
+            // maybe need first item shut down
+            for (int i = 0; i < potion + 1; i++) {
+                result.set(i, false);
+            }
+            if (result.size() > potion + 1) {
+                result.set(potion + 1, false);
+            }
+
         }
-
-
         return result;
     }
 
@@ -202,6 +263,7 @@ public class Parser {
         return element.getElementsByTag("iframe").size() != 0;
     }
 
+    // do change for text count
     private void countForBoolen(Element element, BooleanDto booleanDto) {
 
         Element clone = element.clone();
@@ -209,28 +271,33 @@ public class Parser {
         int countTagA = 0;
         int countTextKeyWord = 0;
         int containText = 0;
-
+        int containTextInATagLenght = 0;
         for (Element byOneDepthToEnd : elementDepthOne) {
 
             if (byOneDepthToEnd.tag().toString().equals("a")) {
+                containTextInATagLenght += byOneDepthToEnd.text().length();
                 countTagA++;
             } else {
                 if (!Objects.equals(byOneDepthToEnd.text(), "")) {
-                    containText++;
+                    Pattern pattern2 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]) ([^\\s]) ((19|20)\\d\\d)");
+                    Elements elements = byOneDepthToEnd.getElementsMatchingText(pattern2);
+                    if (elements.size() == 0) {
+                        containText++;
+                    }
                 }
-            }
-            for (String keyWord : keyWordList) {
-                if (byOneDepthToEnd.text().contains(keyWord)) {
+                if (containKeyWord(byOneDepthToEnd)) {
                     countTextKeyWord++;
                 }
             }
         }
+
         booleanDto.setCountTagA(countTagA);
         booleanDto.setCountTextBy1Depth0(containText);
         booleanDto.setCountTextKeyWord(countTextKeyWord);
+        booleanDto.setContainTextInATag(containTextInATagLenght);
     }
 
-
+    // think delete
     private void recursiveMetodClone(Element mainElement) {
         deleteMetod(mainElement);
         for (Element child : mainElement.children()) {
@@ -238,11 +305,22 @@ public class Parser {
         }
     }
 
+    private boolean containKeyWord(Element element) {
+        for (String keyWord : keyWordList) {
+            if (element.text().contains(keyWord)) {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
 //    private boolean leaveCss(Element child) {
 //        return child.getElementsByTag("link").size() != 0;
 //    }
 
     // delete
+
     private boolean leaveItOrNot(Element clone) {
         List<Element> elementDepthOne = recursiveMetodDeleteAllChildNode(clone, new ArrayList<>());
 
@@ -286,14 +364,12 @@ public class Parser {
         return listOneDepthElem;
     }
 
-    // delete
+    // need change
     private boolean getFlagDeleteByFilters(Element child, Element parant) {
         boolean flag = true;
         // if contain tag script,noscript, style
-        for (String string : filterTag) {
-            if (child.tag().toString().equals(string)) {
-                return true;
-            }
+        if (flagDeleteNoNeedTags(child)) {
+            return true;
         }
         // if contain css
         if (child.tag().toString().equals("link")) {
@@ -303,6 +379,17 @@ public class Parser {
         return flag;
     }
 
+
+    private boolean flagDeleteNoNeedTags(Element element) {
+        for (String string : filterTag) {
+            if (element.tag().toString().equals(string)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // can be change
     private boolean noHaveDateFlag(Element child) {
 
         List<Pattern> patternList = new ArrayList<>();
@@ -316,8 +403,7 @@ public class Parser {
         //Here we find all document elements which have some element with the searched pattern
         for (Pattern pattern : patternList) {
             Elements elements = child.getElementsMatchingText(pattern);
-            if (elements.size() <= 5 &
-                    elements.size() != 0) {
+            if (elements.size() != 0) {
                 return false;
             }
 //                    List<Element> finalElements = elements.stream().filter(elem -> isLastElem(elem, pattern)).collect(Collectors.toList());

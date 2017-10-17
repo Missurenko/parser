@@ -51,7 +51,7 @@ class ReadCopyForIngest {
         for (AllInformationAboutTaskDto info : allInfoList.values()) {
             List<ElementFilteredDto> filteredElement = new ArrayList<>();
 
-
+            List<String> fileForDalete = new ArrayList<>();
             for (File html : info.getFilesForCopy().values()) {
                 if (html != null) {
                     Document doc = null;
@@ -62,18 +62,28 @@ class ReadCopyForIngest {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    ElementFilteredDto nameAndFilteredElem = new ElementFilteredDto();
+
                     Element allElement = doc.getAllElements().first();
 
                     Parser parser = new Parser(allElement, info.getKeyWords(), info.getTAG_FILTER());
                     Element parseredOrigin = parser.start();
-                    nameAndFilteredElem.setFile(html);
-                    nameAndFilteredElem.setFilteredElement(parseredOrigin);
-                    filteredElement.add(nameAndFilteredElem);
-                }
 
+                    if (parseredOrigin == null) {
+                        fileForDalete.add(html.getName());
+                    } else {
+                        ElementFilteredDto nameAndFilteredElem = new ElementFilteredDto();
+                        nameAndFilteredElem.setFile(html);
+                        nameAndFilteredElem.setFilteredElement(parseredOrigin);
+                        filteredElement.add(nameAndFilteredElem);
+                    }
+
+                }
+            }
+            for (String nameFile : fileForDalete) {
+                fileReadWrite.delete(info.getFilesForCopy().get(nameFile));
 
             }
+
             // TODO WARNING  // what have if have zero element
             info.setNameFileAndFilteredElement(filteredElement);
         }
@@ -82,7 +92,7 @@ class ReadCopyForIngest {
             AllInformationAboutTaskDto info = allInfoList.get(nameTask);
             for (ElementFilteredDto dto : info.getNameFileAndFilteredElement()) {
                 String nameFile = dto.getFile().getName();
-                //   fileReadWrite.delete(dto.getFile());
+                fileReadWrite.delete(dto.getFile());
                 fileReadWrite.writeToDir(dto.getFilteredElement(), "A_parsered_Html", nameTask
                         , nameFile);
 

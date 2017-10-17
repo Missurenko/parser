@@ -22,9 +22,11 @@ public class BooleanDto {
 
     private int countTextBy1Depth0;
 
-    private int countTagA = 0;
+    private int countTagA;
 
-    private int countTextKeyWord = 0;
+    private int countTextKeyWord;
+
+    private int containTextInATag;
 
     private boolean deleteOrNot;
 
@@ -115,5 +117,13 @@ public class BooleanDto {
 
     public void setTextLenght(int textLenght) {
         this.textLenght = textLenght;
+    }
+
+    public int getContainTextInATag() {
+        return containTextInATag;
+    }
+
+    public void setContainTextInATag(int containTextInATag) {
+        this.containTextInATag = containTextInATag;
     }
 }
