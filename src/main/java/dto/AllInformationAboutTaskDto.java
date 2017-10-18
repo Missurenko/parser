@@ -65,5 +65,12 @@ public class AllInformationAboutTaskDto {
         this.nameFolderTask = nameFolderTask;
     }
 
-
+    @Override
+    public String toString() {
+        return "\nAllInformationAboutTaskDto{" +
+                "\nkeyWords=" + keyWords +
+                "\n, nameFolderTask='" + nameFolderTask + '\'' +
+                "\n, filesForCopy=" + filesForCopy +
+                "\n}";
+    }
 }

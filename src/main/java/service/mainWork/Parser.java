@@ -185,6 +185,7 @@ public class Parser {
         if (mainElement.tag().toString().equals("html")) {
             if (!containKeyWord(mainElement)) {
                 element = null;
+                System.out.println("Parser element set null");
             }
         }
 

@@ -43,6 +43,8 @@ class ReadCopyForIngest {
                     if (info.getFilesForCopy() == null) {
 
                         info.setFilesForCopy(fileReadWrite.readDir(new HashMap<String, File>(), dirTask, info.getKeyWords()));
+
+                        System.out.println("what contain info.getFilesForCopy()" +   info.getFilesForCopy());
                     } else {
                         info.setFilesForCopy(fileReadWrite.readDir(info.getFilesForCopy(), dirTask, info.getKeyWords()));
                     }
@@ -62,10 +64,10 @@ class ReadCopyForIngest {
                     nullFile++;
                 }
             }
-            if(allInfoList.values().size() ==nullFile){
+            if (allInfoList.values().size() == nullFile) {
 
                 try {
-                     Thread.sleep(4000);
+                    Thread.sleep(4000);
                     System.out.println("Thread wait 4 second empty folder");
                 } catch (InterruptedException e) {
                     System.out.println("Problem this wait");
@@ -98,10 +100,12 @@ class ReadCopyForIngest {
                         Element allElement = doc.getAllElements().first();
 
                         Parser parser = new Parser(allElement, info.getKeyWords(), info.getTAG_FILTER());
+                        System.out.println("Parsed element");
                         Element parseredOrigin = parser.start();
 
                         if (parseredOrigin == null) {
                             fileForDalete.add(html.getName());
+                            System.out.println("Element == null");
                         } else {
                             ElementFilteredDto nameAndFilteredElem = new ElementFilteredDto();
                             nameAndFilteredElem.setFile(html);
@@ -132,7 +136,7 @@ class ReadCopyForIngest {
             for (String nameTask : allInfoList.keySet()) {
                 String[] splitNameTask = nameTask.split("\\[");
                 String[] splitNameTask1 = splitNameTask[1].split("\\]");
-               String endDir = fullDir.concat("/A_parsered_Html" + "/" + splitNameTask1[0]);
+                String endDir = fullDir.concat("/A_parsered_Html" + "/" + splitNameTask1[0]);
 
                 AllInformationAboutTaskDto info = allInfoList.get(nameTask);
                 for (ElementFilteredDto dto : info.getNameFileAndFilteredElement()) {
@@ -143,7 +147,7 @@ class ReadCopyForIngest {
 
                 }
             }
-            for(AllInformationAboutTaskDto info: allInfoList.values()){
+            for (AllInformationAboutTaskDto info : allInfoList.values()) {
                 info.setNameFileAndFilteredElement(new ArrayList<>());
                 info.setFilesForCopy(new HashMap<>());
             }

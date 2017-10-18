@@ -78,28 +78,31 @@ public class FileReadWriteImpl implements FileReadWrite {
         for (File fileEntry : folder.listFiles()) {
 
             Document doc = null;
-            if(fileEntry != null){
-            if (allFiles.containsKey(fileEntry)) {
-                if (!allFiles.get(fileEntry).equals(null)) {
-                    allFiles.put(fileEntry.getName(), null);
+            if (fileEntry != null) {
+                if (allFiles.containsKey(fileEntry)) {
+                    if (!allFiles.get(fileEntry).equals(null)) {
+                        allFiles.put(fileEntry.getName(), null);
+                    }
+                }
+                try {
+                    doc = Jsoup.parse(fileEntry, "UTF-8");
+                    System.out.println("read doc in FileReadWriteImpl");
+                } catch (IOException e) {
+                    System.out.println("Problem this parser in FileReadWriteImpl");
+                    e.printStackTrace();
+                }
+                for (String key : keyWord) {
+                    System.out.println("KeyWord [" + key);
+                }
+                if (!allFiles.containsKey(fileEntry)) {
+                    if (containKeyWordInDoc(doc, keyWord)) {
+                        allFiles.put(fileEntry.getName(), fileEntry);
+                    } else {
+                        fileForDelete.add(fileEntry);
+                        System.out.println("fileForDelete add");
+                    }
                 }
             }
-            try {
-                doc = Jsoup.parse(fileEntry, "UTF-8");
-                System.out.println("read doc in FileReadWriteImpl");
-            } catch (IOException e) {
-                System.out.println("Problem this parser in FileReadWriteImpl");
-                e.printStackTrace();
-            }
-            if (!allFiles.containsKey(fileEntry)) {
-                if (containKeyWordInDoc(doc, keyWord)) {
-                    allFiles.put(fileEntry.getName(), fileEntry);
-                } else {
-                    fileForDelete.add(fileEntry);
-                }
-
-            }
-        }
         }
         for (File file : fileForDelete) {
             file.delete();
@@ -151,7 +154,12 @@ public class FileReadWriteImpl implements FileReadWrite {
             e.printStackTrace();
         }
         //Construct BufferedReader from InputStreamReader
-        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(fis, "UTF8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         System.out.println("");
         String line = null;
         try {
@@ -164,7 +172,6 @@ public class FileReadWriteImpl implements FileReadWrite {
                     }
                 }
                 ;
-
 
             }
             br.close();
@@ -199,6 +206,8 @@ public class FileReadWriteImpl implements FileReadWrite {
     public boolean containKeyWordInDoc(Document doc, List<String> keyWords) {
         for (String keyWord : keyWords) {
             if (doc.text().contains(keyWord)) {
+                System.out.println("FileReadWriteImpl ");
+                System.out.println("Contain keyWord In text" + doc.text().contains(keyWord));
                 return true;
             }
         }

@@ -14,7 +14,7 @@ public class ReadConfiguration {
         FileReadWrite fileReadWrite = new FileReadWriteImpl();
 
         Map<String, AllInformationAboutTaskDto> listForFilter = readConfigurationFile(fileReadWrite);
-
+        System.out.println(listForFilter.toString());
         ReadCopyForIngest readAndIngest = new ReadCopyForIngest(fileReadWrite, listForFilter);
     }
 
@@ -32,7 +32,6 @@ public class ReadConfiguration {
         for (String configLine : configList) {
             if (configLine.equals("[FetchTasks]")) {
                 captionConfig = configLine;
-
             }
             String[] splitLine = configLine.split("=");
             String config = "";
@@ -44,9 +43,7 @@ public class ReadConfiguration {
                 config = splitLine[0];
             }
             if (captionConfig.equals("[FetchTasks]")) {
-
-
-                if (!config.matches("^\\D*$")&
+                if (!config.matches("^\\D*$") &
                         configLine.charAt(0) != '[') {
                     nameTask = value;
                     allTasksInfo.put("[" + nameTask + "]", new AllInformationAboutTaskDto());
@@ -68,6 +65,11 @@ public class ReadConfiguration {
                 String have = value.replaceAll("[.*]", "");
                 String[] regexList = have.split(",");
                 allTasksInfo.get(nameTask).setKeyWords(new ArrayList<>(Arrays.asList(regexList)));
+
+                for (String key : allTasksInfo.get(nameTask).getKeyWords()) {
+                    System.out.println("Key word[" + key+"]");
+
+                }
             }
         }
         return allTasksInfo;
