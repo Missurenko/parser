@@ -23,7 +23,7 @@ public class ReadConfiguration {
         String path = new File(".").getAbsolutePath();
         System.getProperty("user.dir");
 
-        List<String> configList = fileReadWrite.readConfigByLine("C:\\Autonomy\\WebConnector\\temp");
+        List<String> configList = fileReadWrite.readConfigByLine("temp");
         System.out.println("Read config");
         String captionConfig = "License";
         String nameTask = "null";
