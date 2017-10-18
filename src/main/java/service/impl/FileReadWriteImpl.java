@@ -1,6 +1,7 @@
 package service.impl;
 
 //import org.apache.commons.io.FileUtils;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,6 +22,7 @@ public class FileReadWriteImpl implements FileReadWrite {
     //
     @Override
     public Map<String, File> readDir(Map<String, File> allFiles, String dirPathHtml, List<String> keyWord) throws IOException {
+        System.out.println("readDir name: dir" + dirPathHtml);
         File htmlFile = new File(dirPathHtml);
         return listFilesFilteredForFolder(allFiles, htmlFile, keyWord);
     }
@@ -30,33 +32,30 @@ public class FileReadWriteImpl implements FileReadWrite {
     public boolean writeToDir(Element parseredOrigin, String path, String nameDirTask, String nameDoc) {
 
 
-
         File pathFile = new File(path);
-        String nameDir = path.concat("/" + nameDirTask);
-        File directory = new File(nameDir);
-        String nameFullPathFile = nameDir.concat("/" + nameDoc);
+
 
         if (!pathFile.exists()) {
-            directory.mkdir();
-            // If you require it to make the entire directory path including parents,
-            // use directory.mkdirs(); here instead.
-        }
-        if (!directory.exists()) {
-            directory.mkdir();
+
+            boolean craete = new File(path).mkdirs();
+            System.out.println("create folder" + craete);
             // If you require it to make the entire directory path including parents,
             // use directory.mkdirs(); here instead.
         }
 
 //        File dirPath = new File("C:\\Autonomy\\WebConnector\\example\\" +nameDoc);
-                File dirPath = new File("C:\\Autonomy\\WebConnector\\example\\" +nameDoc);
+        File dirPath = new File(path + "/" + nameDoc);
         PrintStream out = null;
         try {
+            System.out.println("writeToDir name: dir" + nameDirTask + "/n" +
+                    "name doc" + nameDoc);
             out = new PrintStream(
                     new BufferedOutputStream(
                             new FileOutputStream(dirPath, true)));
             out.println(parseredOrigin);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Exeption in writer");
+            System.out.println(e.toString());
         } finally {
             if (out != null) {
                 out.close();
@@ -69,14 +68,17 @@ public class FileReadWriteImpl implements FileReadWrite {
     }
 
     // TODO Change metod give only 1 folder
-    private Map<String, File> listFilesFilteredForFolder(Map<String, File> allFiles, final File folder, List<String> keyWord) {
+    private Map<String, File> listFilesFilteredForFolder(Map<String, File> allFiles, File folder, List<String> keyWord) {
 
         if (folder.listFiles() == null) {
             return allFiles;
         }
         // test this part
-        for (final File fileEntry : folder.listFiles()) {
+        List<File> fileForDelete = new ArrayList<>();
+        for (File fileEntry : folder.listFiles()) {
+
             Document doc = null;
+            if(fileEntry != null){
             if (allFiles.containsKey(fileEntry)) {
                 if (!allFiles.get(fileEntry).equals(null)) {
                     allFiles.put(fileEntry.getName(), null);
@@ -84,17 +86,23 @@ public class FileReadWriteImpl implements FileReadWrite {
             }
             try {
                 doc = Jsoup.parse(fileEntry, "UTF-8");
+                System.out.println("read doc in FileReadWriteImpl");
             } catch (IOException e) {
+                System.out.println("Problem this parser in FileReadWriteImpl");
                 e.printStackTrace();
             }
             if (!allFiles.containsKey(fileEntry)) {
                 if (containKeyWordInDoc(doc, keyWord)) {
                     allFiles.put(fileEntry.getName(), fileEntry);
                 } else {
-                    fileEntry.delete();
+                    fileForDelete.add(fileEntry);
                 }
 
             }
+        }
+        }
+        for (File file : fileForDelete) {
+            file.delete();
         }
         return allFiles;
     }
@@ -134,17 +142,20 @@ public class FileReadWriteImpl implements FileReadWrite {
         List<String> result = new ArrayList<>();
         File folderFile = new File(folder);
         String fullPath = fileConfigFullPath(folderFile).getAbsolutePath();
+        System.out.println("Start read config file");
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(fullPath);
         } catch (FileNotFoundException e) {
+            System.out.println("Exeption read config FileNotFoundException");
             e.printStackTrace();
         }
         //Construct BufferedReader from InputStreamReader
         BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-
+        System.out.println("");
         String line = null;
         try {
+            System.out.println("Start read lines");
             while ((line = br.readLine()) != null) {
                 String[] splitLine = line.split("/");
                 if (!splitLine[0].equals("")) {
@@ -158,6 +169,7 @@ public class FileReadWriteImpl implements FileReadWrite {
             }
             br.close();
         } catch (IOException e) {
+            System.out.println("Exeption when read config by line");
             e.printStackTrace();
         }
 

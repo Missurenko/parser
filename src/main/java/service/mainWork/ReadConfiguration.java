@@ -19,12 +19,12 @@ public class ReadConfiguration {
     }
 
     private Map<String, AllInformationAboutTaskDto> readConfigurationFile(FileReadWrite fileReadWrite) {
-
+        System.out.println("Start work condig reader");
         String path = new File(".").getAbsolutePath();
         System.getProperty("user.dir");
 
-        List<String> configList = fileReadWrite.readConfigByLine("temp");
-
+        List<String> configList = fileReadWrite.readConfigByLine("C:\\Autonomy\\WebConnector\\temp");
+        System.out.println("Read config");
         String captionConfig = "License";
         String nameTask = "null";
 

@@ -202,56 +202,42 @@ public class Parser {
         int lenghtTagA = 0;
         int lenghtClearText = 0;
         int falseFlag = 0;
-        int potionByCleanText = -1;
-        int potionByPercent = -1;
-        double percent = 0.0;
+        int potion = -1;
         for (int i = 0; i < booleanDtoChildList.size(); i++) {
             BooleanDto child = booleanDtoChildList.get(i);
             lenght = child.getTextLenght();
             lenghtTagA = child.getLenghtTextInATag();
             if (lenghtClearText < cleanText(lenght, lenghtTagA)) {
                 lenghtClearText = cleanText(lenght, lenghtTagA);
-                potionByCleanText = i;
+                potion = i;
             }
-            if (lenght > 0 & lenghtClearText > 0) {
-                double localPercent = (lenghtClearText + 0.0) / lenght;
-                if (percent < localPercent & localPercent != 1.0) {
-                    percent = (lenghtClearText + 0.0) / lenght;
-                    potionByPercent = i;
-                }
-                result.add(true);
-            }
+            result.add(true);
         }
         BooleanDto moreTextThenOther = new BooleanDto();
-        if (potionByCleanText != -1) {
-            moreTextThenOther = booleanDtoChildList.get(potionByCleanText);
+        if (potion != -1) {
+            moreTextThenOther = booleanDtoChildList.get(potion);
 
         }
         if (booleanDtoParant.getCountTextKeyWord() > 0) {
             if (booleanDtoParant.isContainH1() &
                     moreTextThenOther.getCountTextKeyWord() > 0 &
                     moreTextThenOther.isContainH1()) {
-                result.set(potionByCleanText, false);
+                result.set(potion, false);
                 falseFlag++;
-            } else if (booleanDtoChildList.get(0).isContainH1() &
-                    booleanDtoChildList.get(0).getCountTextKeyWord() > 0 &
-                    booleanDtoChildList.get(0).getTextLenght() > 150) {
-                result.set(0, false);
             } else if (moreTextThenOther.getLenghtTextInATag() >
                     moreTextThenOther.getTextLenght()) {
-                result.set(potionByCleanText, true);
+                result.set(potion, true);
             } else {
                 // maybe need first item shut down
-                for (int i = 0; i < potionByCleanText + 1; i++) {
+                for (int i = 0; i < potion + 1; i++) {
                     result.set(i, false);
                     falseFlag++;
                 }
-                if (result.size() > potionByCleanText + 1) {
-                    result.set(potionByCleanText + 1, false);
+                if (result.size() > potion + 1) {
+                    result.set(potion + 1, false);
                     falseFlag++;
                 }
-
-                for (int i = potionByCleanText + 2; i < booleanDtoChildList.size() - 1; i++) {
+                for (int i = potion + 2; i < booleanDtoChildList.size(); i++) {
                     if (cleanText(booleanDtoChildList.get(i).getTextLenght(),
                             booleanDtoChildList.get(i).getLenghtTextInATag()) > 0) {
                         result.set(i, false);
@@ -259,39 +245,24 @@ public class Parser {
                         break;
                     }
                 }
-
                 String ss = "ss";
             }
         }
 
-        if (potionByCleanText != potionByPercent)
 
-        {
-            if (booleanDtoParant.getCountTextKeyWord() > 0) {
-                if (booleanDtoParant.isContainH1() &
-                        booleanDtoChildList.get(potionByPercent).getCountTextKeyWord() > 0 &
-                        booleanDtoChildList.get(potionByPercent).isContainH1()) {
-                    for (int i = 0; i < result.size(); i++) {
-                        result.set(i, true);
+        if (falseFlag > 1) {
+            BooleanDto child = booleanDtoChildList.get(potion);
+            lenght = child.getTextLenght();
+            lenghtTagA = child.getLenghtTextInATag();
+            lenghtClearText = lenght - lenghtTagA;
+            if (lenghtClearText < lenghtTagA) {
+                for (int i = 0; i < result.size(); i++) {
+                    result.set(i, true);
 
-                    }
-                    result.set(potionByPercent, false);
                 }
+                result.set(potion, false);
             }
         }
-//        if (falseFlag > 1) {
-//            BooleanDto child = booleanDtoChildList.get(potionByCleanText);
-//            lenght = child.getTextLenght();
-//            lenghtTagA = child.getLenghtTextInATag();
-//            lenghtClearText = lenght - lenghtTagA;
-//
-//            if (lenghtClearText < lenghtTagA) {
-//                for (int i = 0; i < result.size(); i++) {
-//                    result.set(i, true);
-//
-//                }
-//            }
-//        }
         return result;
     }
 
