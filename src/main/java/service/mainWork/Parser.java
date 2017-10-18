@@ -201,40 +201,57 @@ public class Parser {
         int lenght = 0;
         int lenghtTagA = 0;
         int lenghtClearText = 0;
-
-        int potion = -1;
+        int falseFlag = 0;
+        int potionByCleanText = -1;
+        int potionByPercent = -1;
+        double percent = 0.0;
         for (int i = 0; i < booleanDtoChildList.size(); i++) {
             BooleanDto child = booleanDtoChildList.get(i);
             lenght = child.getTextLenght();
             lenghtTagA = child.getLenghtTextInATag();
             if (lenghtClearText < cleanText(lenght, lenghtTagA)) {
                 lenghtClearText = cleanText(lenght, lenghtTagA);
-                potion = i;
+                potionByCleanText = i;
             }
-            result.add(true);
+            if (lenght > 0 & lenghtClearText > 0) {
+                double localPercent = (lenghtClearText + 0.0) / lenght;
+                if (percent < localPercent & localPercent != 1.0) {
+                    percent = (lenghtClearText + 0.0) / lenght;
+                    potionByPercent = i;
+                }
+                result.add(true);
+            }
         }
         BooleanDto moreTextThenOther = new BooleanDto();
-        if (potion != -1) {
-            moreTextThenOther = booleanDtoChildList.get(potion);
+        if (potionByCleanText != -1) {
+            moreTextThenOther = booleanDtoChildList.get(potionByCleanText);
 
         }
         if (booleanDtoParant.getCountTextKeyWord() > 0) {
             if (booleanDtoParant.isContainH1() &
                     moreTextThenOther.getCountTextKeyWord() > 0 &
                     moreTextThenOther.isContainH1()) {
-                result.set(potion, false);
+                result.set(potionByCleanText, false);
+                falseFlag++;
+            } else if (booleanDtoChildList.get(0).isContainH1() &
+                    booleanDtoChildList.get(0).getCountTextKeyWord() > 0 &
+                    booleanDtoChildList.get(0).getTextLenght() > 150) {
+                result.set(0, false);
             } else if (moreTextThenOther.getLenghtTextInATag() >
                     moreTextThenOther.getTextLenght()) {
-                result.set(potion, true);
+                result.set(potionByCleanText, true);
             } else {
                 // maybe need first item shut down
-                for (int i = 0; i < potion + 1; i++) {
+                for (int i = 0; i < potionByCleanText + 1; i++) {
                     result.set(i, false);
+                    falseFlag++;
                 }
-                if (result.size() > potion + 1) {
-                    result.set(potion + 1, false);
+                if (result.size() > potionByCleanText + 1) {
+                    result.set(potionByCleanText + 1, false);
+                    falseFlag++;
                 }
-                for (int i = potion + 2; i < booleanDtoChildList.size(); i++) {
+
+                for (int i = potionByCleanText + 2; i < booleanDtoChildList.size() - 1; i++) {
                     if (cleanText(booleanDtoChildList.get(i).getTextLenght(),
                             booleanDtoChildList.get(i).getLenghtTextInATag()) > 0) {
                         result.set(i, false);
@@ -242,8 +259,39 @@ public class Parser {
                         break;
                     }
                 }
+
+                String ss = "ss";
             }
         }
+
+        if (potionByCleanText != potionByPercent)
+
+        {
+            if (booleanDtoParant.getCountTextKeyWord() > 0) {
+                if (booleanDtoParant.isContainH1() &
+                        booleanDtoChildList.get(potionByPercent).getCountTextKeyWord() > 0 &
+                        booleanDtoChildList.get(potionByPercent).isContainH1()) {
+                    for (int i = 0; i < result.size(); i++) {
+                        result.set(i, true);
+
+                    }
+                    result.set(potionByPercent, false);
+                }
+            }
+        }
+//        if (falseFlag > 1) {
+//            BooleanDto child = booleanDtoChildList.get(potionByCleanText);
+//            lenght = child.getTextLenght();
+//            lenghtTagA = child.getLenghtTextInATag();
+//            lenghtClearText = lenght - lenghtTagA;
+//
+//            if (lenghtClearText < lenghtTagA) {
+//                for (int i = 0; i < result.size(); i++) {
+//                    result.set(i, true);
+//
+//                }
+//            }
+//        }
         return result;
     }
 
@@ -292,21 +340,42 @@ public class Parser {
         int containText = 0;
         int keyWordInTagA = 0;
         int lenghtTextInATagLenght = 0;
-        for (Element byOneDepthToEnd : elementDepthOne) {
 
-            if (byOneDepthToEnd.tag().toString().equals("a")) {
-                lenghtTextInATagLenght += byOneDepthToEnd.text().length();
-                countTagA++;
-                if (containKeyWord(byOneDepthToEnd)) {
-                    keyWordInTagA++;
-                }
-            } else {
-                if (!Objects.equals(byOneDepthToEnd.text(), "")) {
-                    Pattern pattern2 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]) ([^\\s]) ((19|20)\\d\\d)");
-                    Elements elements = byOneDepthToEnd.getElementsMatchingText(pattern2);
-                    if (elements.size() == 0) {
-                        containText++;
+        int number = 0;
+        for (Element byOneDepthToEnd : elementDepthOne) {
+            number++;
+
+            if (byOneDepthToEnd.parents().size() > 3) {
+                if (byOneDepthToEnd.tag().toString().equals("a")) {
+                    lenghtTextInATagLenght += byOneDepthToEnd.text().length();
+                    countTagA++;
+                    if (containKeyWord(byOneDepthToEnd)) {
+                        keyWordInTagA++;
                     }
+                } else if (byOneDepthToEnd.parent().tag().toString().equals("a")) {
+                    lenghtTextInATagLenght += byOneDepthToEnd.text().length();
+                    countTagA++;
+                    if (containKeyWord(byOneDepthToEnd)) {
+                        keyWordInTagA++;
+                    }
+                } else if (byOneDepthToEnd.parent().parent().tag().toString().equals("a")) {
+                    lenghtTextInATagLenght += byOneDepthToEnd.text().length();
+                    countTagA++;
+                    if (containKeyWord(byOneDepthToEnd)) {
+                        keyWordInTagA++;
+                    }
+                } else if (byOneDepthToEnd.parent().parent().parent().tag().toString().equals("a")) {
+                    lenghtTextInATagLenght += byOneDepthToEnd.text().length();
+                    countTagA++;
+                    if (containKeyWord(byOneDepthToEnd)) {
+                        keyWordInTagA++;
+                    }
+                }
+
+                if (!Objects.equals(byOneDepthToEnd.text(), "")) {
+//                    Pattern pattern2 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]) ([^\\s]) ((19|20)\\d\\d)");
+//                    Elements elements = byOneDepthToEnd.getElementsMatchingText(pattern2);
+                    containText++;
                 }
                 if (containKeyWord(byOneDepthToEnd)) {
                     countTextKeyWord++;
@@ -314,6 +383,7 @@ public class Parser {
             }
         }
 
+        booleanDto.setKeyWordInTagA(keyWordInTagA);
         booleanDto.setCountTagA(countTagA);
         booleanDto.setCountTextBy1Depth0(containText);
         booleanDto.setCountTextKeyWord(countTextKeyWord);
