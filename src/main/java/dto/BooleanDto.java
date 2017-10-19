@@ -28,6 +28,10 @@ public class BooleanDto {
 
     private int lenghtTextInATag;
 
+    private int lenghtClearText;
+
+    private int countKeyWordInClearText;
+
     private int keyWordInTagA;
 
     private boolean deleteOrNot;
@@ -38,6 +42,22 @@ public class BooleanDto {
 
     public int getKeyWordInTagA() {
         return keyWordInTagA;
+    }
+
+    public int getLenghtClearText() {
+        return lenghtClearText;
+    }
+
+    public void setLenghtClearText(int lenghtClearText) {
+        this.lenghtClearText = lenghtClearText;
+    }
+
+    public int getCountKeyWordInClearText() {
+        return countKeyWordInClearText;
+    }
+
+    public void setCountKeyWordInClearText(int countKeyWordInClearText) {
+        this.countKeyWordInClearText = countKeyWordInClearText;
     }
 
     public void setKeyWordInTagA(int keyWordInTagA) {

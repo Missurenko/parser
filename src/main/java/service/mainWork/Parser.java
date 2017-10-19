@@ -2,6 +2,7 @@ package service.mainWork;
 
 
 import dto.BooleanDto;
+import dto.RecursiaForTagADto;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -219,9 +220,9 @@ public class Parser {
             moreTextThenOther = booleanDtoChildList.get(potion);
 
         }
-        if (booleanDtoParant.getCountTextKeyWord() > 0) {
+        if (booleanDtoParant.getCountKeyWordInClearText() > 0) {
             if (booleanDtoParant.isContainH1() &
-                    moreTextThenOther.getCountTextKeyWord() > 0 &
+                    moreTextThenOther.getCountKeyWordInClearText() > 0 &
                     moreTextThenOther.isContainH1()) {
                 result.set(potion, false);
                 falseFlag++;
@@ -230,22 +231,25 @@ public class Parser {
                 result.set(potion, true);
             } else {
                 // maybe need first item shut down
-                for (int i = 0; i < potion + 1; i++) {
-                    result.set(i, false);
-                    falseFlag++;
-                }
-                if (result.size() > potion + 1) {
-                    result.set(potion + 1, false);
-                    falseFlag++;
-                }
-                for (int i = potion + 2; i < booleanDtoChildList.size(); i++) {
-                    if (cleanText(booleanDtoChildList.get(i).getTextLenght(),
-                            booleanDtoChildList.get(i).getLenghtTextInATag()) > 0) {
+                if (!booleanDtoChildList.get(potion).isContainH1()) {
+                    for (int i = 0; i < potion + 1; i++) {
                         result.set(i, false);
-                    } else {
-                        break;
+                        falseFlag++;
+                    }
+                    if (result.size() > potion + 1) {
+                        result.set(potion + 1, false);
+                        falseFlag++;
+                    }
+                    for (int i = potion + 2; i < booleanDtoChildList.size(); i++) {
+                        if (cleanText(booleanDtoChildList.get(i).getTextLenght(),
+                                booleanDtoChildList.get(i).getLenghtTextInATag()) > 0) {
+                            result.set(i, false);
+                        } else {
+                            break;
+                        }
                     }
                 }
+
                 String ss = "ss";
             }
         }
@@ -312,54 +316,77 @@ public class Parser {
         int containText = 0;
         int keyWordInTagA = 0;
         int lenghtTextInATagLenght = 0;
+        int lenghtClearText = 0;
+        int countClearTextKeyWord = 0;
+
 
         int number = 0;
+
         for (Element byOneDepthToEnd : elementDepthOne) {
             number++;
-
-            if (byOneDepthToEnd.parents().size() > 3) {
-                if (byOneDepthToEnd.tag().toString().equals("a")) {
-                    lenghtTextInATagLenght += byOneDepthToEnd.text().length();
-                    countTagA++;
-                    if (containKeyWord(byOneDepthToEnd)) {
-                        keyWordInTagA++;
-                    }
-                } else if (byOneDepthToEnd.parent().tag().toString().equals("a")) {
-                    lenghtTextInATagLenght += byOneDepthToEnd.text().length();
-                    countTagA++;
-                    if (containKeyWord(byOneDepthToEnd)) {
-                        keyWordInTagA++;
-                    }
-                } else if (byOneDepthToEnd.parent().parent().tag().toString().equals("a")) {
-                    lenghtTextInATagLenght += byOneDepthToEnd.text().length();
-                    countTagA++;
-                    if (containKeyWord(byOneDepthToEnd)) {
-                        keyWordInTagA++;
-                    }
-                } else if (byOneDepthToEnd.parent().parent().parent().tag().toString().equals("a")) {
-                    lenghtTextInATagLenght += byOneDepthToEnd.text().length();
-                    countTagA++;
-                    if (containKeyWord(byOneDepthToEnd)) {
-                        keyWordInTagA++;
-                    }
+            if (number == 20) {
+                int numbesr = 0;
+            }
+            RecursiaForTagADto checkTagA = new RecursiaForTagADto();
+            checkTagA.setElement(byOneDepthToEnd);
+            if (containTagAByThreeDepth(checkTagA)) {
+                lenghtTextInATagLenght += byOneDepthToEnd.text().length();
+                countTagA++;
+                if (containKeyWord(byOneDepthToEnd)) {
+                    keyWordInTagA++;
+                }
+            } else {
+                lenghtClearText += byOneDepthToEnd.text().length();
+                if (containKeyWord(byOneDepthToEnd)) {
+                    countClearTextKeyWord++;
                 }
 
-                if (!Objects.equals(byOneDepthToEnd.text(), "")) {
+            }
+            if (!Objects.equals(byOneDepthToEnd.text(), "")) {
 //                    Pattern pattern2 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]) ([^\\s]) ((19|20)\\d\\d)");
 //                    Elements elements = byOneDepthToEnd.getElementsMatchingText(pattern2);
-                    containText++;
-                }
-                if (containKeyWord(byOneDepthToEnd)) {
-                    countTextKeyWord++;
-                }
+                containText++;
             }
-        }
+            if (containKeyWord(byOneDepthToEnd)) {
+                countTextKeyWord++;
+            }
 
+        }
+        booleanDto.setLenghtClearText(lenghtClearText);
+        booleanDto.setCountKeyWordInClearText(countClearTextKeyWord);
         booleanDto.setKeyWordInTagA(keyWordInTagA);
         booleanDto.setCountTagA(countTagA);
         booleanDto.setCountTextBy1Depth0(containText);
         booleanDto.setCountTextKeyWord(countTextKeyWord);
         booleanDto.setLenghtTextInATag(lenghtTextInATagLenght);
+    }
+
+    private boolean containParantThisTagA(Element element) {
+        return null != element.parent() &
+                element.tag().toString().equals("a");
+
+    }
+
+    private boolean containTagAByThreeDepth(RecursiaForTagADto recursiaForTagADto) {
+        if (recursiaForTagADto.getCountDepth() == 3) {
+            return false;
+        } else {
+            Element element = recursiaForTagADto.getElement();
+            int count = recursiaForTagADto.getCountDepth();
+            if (containParantThisTagA(element)) {
+                return true;
+            } else {
+                recursiaForTagADto.setCountDepth(count + 1);
+                if (element.parent() != null) {
+                    recursiaForTagADto.setElement(element.parent());
+                    return containTagAByThreeDepth(recursiaForTagADto);
+                } else {
+                    return false;
+                }
+
+            }
+        }
+
     }
 
     // think delete

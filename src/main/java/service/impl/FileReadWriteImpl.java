@@ -122,9 +122,12 @@ public class FileReadWriteImpl implements FileReadWrite {
         }
         for (final File fileEntry : folder.listFiles()) {
             String[] fileName = fileEntry.getName().split("\\.");
-            if (fileName[1].equals("txt")) {
-                return fileEntry;
+            if (fileName.length > 1) {
+                if (fileName[1].equals("txt")) {
+                    return fileEntry;
+                }
             }
+
         }
         System.out.println("Need do txt file configuration webConnector/temp/");
         fileConfigFullPath(folder);

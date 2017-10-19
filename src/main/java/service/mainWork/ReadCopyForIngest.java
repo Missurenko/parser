@@ -36,19 +36,17 @@ class ReadCopyForIngest {
             String dir = "";
             for (AllInformationAboutTaskDto info : allInfoList.values()) {
                 String dirTask = info.getNameFolderTask();
+
+                    info.setNameFileAndFilteredElement(new ArrayList<>());
+                    info.setFilesForCopy(new HashMap<>());
+
+
                 if (dir.equals("")) {
                     dir = info.getNameFolderTask();
                 }
                 try {
-                    if (info.getFilesForCopy() == null) {
-
-                        info.setFilesForCopy(fileReadWrite.readDir(new HashMap<String, File>(), dirTask, info.getKeyWords()));
-
-                        System.out.println("what contain info.getFilesForCopy()" +   info.getFilesForCopy());
-                    } else {
-                        info.setFilesForCopy(fileReadWrite.readDir(info.getFilesForCopy(), dirTask, info.getKeyWords()));
-                    }
-
+                                           info.setFilesForCopy(fileReadWrite.readDir(new HashMap<String, File>(), dirTask, info.getKeyWords()));
+                        System.out.println("what contain info." +   info.getFilesForCopy());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -147,10 +145,7 @@ class ReadCopyForIngest {
 
                 }
             }
-            for (AllInformationAboutTaskDto info : allInfoList.values()) {
-                info.setNameFileAndFilteredElement(new ArrayList<>());
-                info.setFilesForCopy(new HashMap<>());
-            }
+
         } while (true);
 
     }
