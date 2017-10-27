@@ -27,7 +27,6 @@ public class FileReadWriteImpl implements FileReadWrite {
         return listFilesFilteredForFolder(allFiles, htmlFile, keyWord);
     }
 
-
     @Override
     public boolean writeToDir(Element parseredOrigin, String path, String nameDirTask, String nameDoc) {
 
@@ -66,6 +65,32 @@ public class FileReadWriteImpl implements FileReadWrite {
         return true;
 
     }
+
+    @Override
+    public boolean writeToDir(Element parseredOrigin, String nameDoc) {
+
+        File pathFile = new File(nameDoc);
+        PrintStream out = null;
+        try {
+            System.out.println("writeToDir name: dir" + nameDoc);
+            out = new PrintStream(
+                    new BufferedOutputStream(
+                            new FileOutputStream(pathFile, false)));
+            out.println(parseredOrigin);
+        } catch (IOException e) {
+            System.out.println("Exeption in writer");
+            System.out.println(e.toString());
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+        }
+        System.out.println("Writer : ");
+
+        return true;
+
+    }
+
 
     // TODO Change metod give only 1 folder
     private Map<String, File> listFilesFilteredForFolder(Map<String, File> allFiles, File folder, List<String> keyWord) {
@@ -114,7 +139,7 @@ public class FileReadWriteImpl implements FileReadWrite {
 
         if (folder.listFiles() == null) {
             try {
-                wait(1000);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -187,22 +212,73 @@ public class FileReadWriteImpl implements FileReadWrite {
         return result;
     }
 
-    @Override
-    public List<String> readConfigurationTxt(String folder) {
+    private boolean existOrNot(String path) {
+        File file = new File(path);
+        while (!file.exists()) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ie) { /* safe to ignore */ }
+        }
+        return true;
+    }
 
-        List<String> lines = null;
-//        try {
-//
-//            File folderFile = new File(folder);
-//            String fullPath = fileConfigFullPath(folderFile).getAbsolutePath();
-//            File file = new File(fullPath);
-//
-////            lines = FileUtils.readLines(file, "UTF-8");
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+    @Override
+    public String readConfigurationTxt(String folder, String txt) {
+        String url = "";
+        String path = folder.concat("/" + txt);
+        String lines = "";
+        FileInputStream fis = null;
+        if (existOrNot(path)) {
+            try {
+
+                fis = new FileInputStream(path);
+            } catch (FileNotFoundException e) {
+                System.out.println("Exeption read readConfigurationTxt");
+                e.printStackTrace();
+            }
+            BufferedReader br = null;
+            try {
+                br = new BufferedReader(new InputStreamReader(fis, "UTF8"));
+                lines = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }finally {
+                try {
+                    if (br != null) {
+                        br.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+                File file = new File(path);
+//                file.delete();
+                return lines;
+            }
         return lines;
+    }
+
+    @Override
+    public void writeToDir(String whereWrite) {
+        File pathFile = new File(whereWrite);
+        PrintStream out = null;
+        try {
+            System.out.println("writeToDir name: dir" + whereWrite);
+            out = new PrintStream(
+                    new BufferedOutputStream(
+                            new FileOutputStream(pathFile, false)));
+            out.println("");
+        } catch (IOException e) {
+            System.out.println("Exeption in writer");
+            System.out.println(e.toString());
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+        }
+        System.out.println("Writer : clean file ");
+
+
     }
 
 

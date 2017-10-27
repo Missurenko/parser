@@ -153,7 +153,7 @@ ClipPageUsingCssUnselect=div.hdtb-msb
 // При включенні on_3=(.*Общественный транспорт.*|.*городской транспорт.*|.*общественный транспорт.*)
 // on_1=(.*news.*|.*search.* ), on_2 знаходить нічого
 // on_3 change (.*Общественный.*|.*транспорт.*|.*городской.*|.*общественный.*|.*Транспорт.*)
-PageMustHaveRegex=.*суббота.*
+PageMustHaveRegex=.*Киев.*
 //on_7 change to 5
 PageDelay=5s
 //on_8 change to FALSE

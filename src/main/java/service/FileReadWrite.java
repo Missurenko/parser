@@ -20,6 +20,8 @@ public interface FileReadWrite {
 
     boolean writeToDir( Element parseredOrigin,String path, String dirPathHtml, String nameDoc);
 
+    boolean writeToDir(Element parseredOrigin, String nameDoc);
+
     boolean delete(File file);
 
 
@@ -27,7 +29,9 @@ public interface FileReadWrite {
 
     List<String> readConfigByLine(String folder);
 
-    List<String> readConfigurationTxt(String pathName);
+    String readConfigurationTxt(String folder, String pathName);
+
+    void writeToDir(String whereWrite);
 
 
     // delete child

@@ -121,61 +121,7 @@ public class Parser {
             }
         }
 
-//        deleteMetod(mainElement);
-        // змінити звітси
-
-//        List<Element> clonesList = new ArrayList<>();
-//        for (Element child : mainElement.children()) {
-//            int countKeyWordChild = 0;
-//
-//            Element mainBranch;
-//            mainBranch = mainElement.clone();
-//
-//            if (!leaveItOrNot(mainBranch)) {
-//                mainElement.remove();
-//            }
-//
-//            for (Element childForCount : mainElement.children()) {
-//                if (!noContainKeyWordInElement(childForCount, keyWordList)) {
-//                    countKeyWordChild++;
-//                }
-//            }
-//            if (!mainElement.tag().toString().equals("body") &
-//                    !mainElement.tag().toString().equals("head") &
-//                    !mainElement.tag().toString().equals("html") &
-//                    !child.tag().toString().equals("body") &
-//                    !child.tag().toString().equals("head") &
-//                    !child.tag().toString().equals("html")) {
-//                if (countKeyWordChild >= 2 |
-//                        countKeyWordChild >= 1 &
-//                                !noHaveDateFlag(child)) {
-//
-//                    Element childBranch;
-//                    childBranch = child.clone();
-//
-//                    recursiveMetodClone(childBranch);
-//                    clonesList.add(childBranch);
-//                    // до сюди
-//                }
-//
-//            }
-//        }
-
-//        for (Element cloneChild : clonesList) {
-//            String ss = "ss";
-//            saveOrNot.add(leaveItOrNot(cloneChild));
-//        }
-//        String sss = "ss";
-//        boolean doContinue = true;
-//        for (int i = saveOrNot.size() - 1; i >= 0; --i) {
-//            String ssss = "ss";
-//            if (saveOrNot.get(i)) {
-//                doContinue = false;
-//            } else {
-//                mainElement.child(i).remove();
-//            }
-//        }
-        if (countForEnd < 2) {
+        if (countForEnd < 2 & htmlTagMetod(mainElement)) {
             for (Element child : mainElement.children()) {
                 if (!child.tag().toString().equals("head")) {
                     recursiveMetod(child);
@@ -183,18 +129,25 @@ public class Parser {
             }
         }
 
+
+    }
+
+    private boolean htmlTagMetod(Element mainElement) {
         if (mainElement.tag().toString().equals("html")) {
+            if (mainElement.getElementsByTag("h1").size() == 0 &
+                    mainElement.getElementsByTag("h2").size() == 0) {
+                element = null;
+                System.out.println("Parser element set null");
+                return false;
+            }
             if (!containKeyWord(mainElement)) {
                 element = null;
                 System.out.println("Parser element set null");
+                return false;
             }
         }
+        return true;
 
-//        for (int i = 0; i < goMoreDeep.size(); i++) {
-//            if (goMoreDeep.get(i)) {
-//                recursiveMetod(mainElement.child(i));
-//            }
-//        }
     }
 
     private List<Boolean> flagForDalete(BooleanDto
@@ -231,7 +184,7 @@ public class Parser {
                 result.set(potion, true);
             } else {
                 // maybe need first item shut down
-                if (!booleanDtoChildList.get(potion).isContainH1()) {
+                if (booleanDtoChildList.get(potion).isContainH1()) {
                     for (int i = 0; i < potion + 1; i++) {
                         result.set(i, false);
                         falseFlag++;
@@ -249,23 +202,37 @@ public class Parser {
                         }
                     }
                 }
-
                 String ss = "ss";
             }
+
         }
-
-
         if (falseFlag > 1) {
-            BooleanDto child = booleanDtoChildList.get(potion);
-            lenght = child.getTextLenght();
-            lenghtTagA = child.getLenghtTextInATag();
-            lenghtClearText = lenght - lenghtTagA;
-            if (lenghtClearText < lenghtTagA) {
-                for (int i = 0; i < result.size(); i++) {
-                    result.set(i, true);
+            for (BooleanDto child : booleanDtoChildList) {
+                lenght = child.getTextLenght();
+                lenghtTagA = child.getLenghtTextInATag();
+                lenghtClearText = lenght - lenghtTagA;
+                if (lenghtClearText < lenghtTagA) {
+                    for (int i = 0; i < result.size(); i++) {
+                        result.set(i, true);
+
+                    }
+                    result.set(potion, false);
+                }
+            }
+        }
+        int headSubject = -1;
+        if (falseFlag == 1) {
+            for (int i = 0; i < booleanDtoChildList.size(); i++) {
+                BooleanDto child = booleanDtoChildList.get(i);
+                if (child.getCountKeyWordInClearText() > 0 &
+                        child.isContainH1()) {
+                    headSubject = i;
+                }
+                if(headSubject != -1& potion != headSubject){
 
                 }
-                result.set(potion, false);
+
+
             }
         }
         return result;
@@ -319,9 +286,7 @@ public class Parser {
         int lenghtClearText = 0;
         int countClearTextKeyWord = 0;
 
-
         int number = 0;
-
         for (Element byOneDepthToEnd : elementDepthOne) {
             number++;
             if (number == 20) {
@@ -340,7 +305,6 @@ public class Parser {
                 if (containKeyWord(byOneDepthToEnd)) {
                     countClearTextKeyWord++;
                 }
-
             }
             if (!Objects.equals(byOneDepthToEnd.text(), "")) {
 //                    Pattern pattern2 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]) ([^\\s]) ((19|20)\\d\\d)");
