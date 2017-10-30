@@ -138,9 +138,9 @@ public class Parser {
             if (mainElement.getElementsByTag("h1").size() == 0 &
                     mainElement.getElementsByTag("h2").size() == 0) {
 
-                    element = null;
-                    System.out.println("Parser element set null");
-                    return false;
+                element = null;
+                System.out.println("Parser element set null");
+                return false;
 
             }
             if (!containKeyWord(mainElement)) {
@@ -161,6 +161,7 @@ public class Parser {
         int lenghtClearText = 0;
         int falseFlag = 0;
         int positionMoreCleanText = -1;
+        int countH1H2 = 0;
         for (int i = 0; i < booleanDtoChildList.size(); i++) {
             BooleanDto child = booleanDtoChildList.get(i);
             lenght = child.getTextLenght();
@@ -169,6 +170,10 @@ public class Parser {
                 lenghtClearText = cleanText(lenght, lenghtTagA);
                 positionMoreCleanText = i;
             }
+            if (child.isContainH1()) {
+                countH1H2++;
+            }
+
             result.add(true);
         }
         BooleanDto moreTextThenOther = new BooleanDto();
@@ -177,9 +182,6 @@ public class Parser {
 
         }
         if (booleanDtoParant.getCountKeyWordInClearText() > 0) {
-            for(int i = 0; i < booleanDtoChildList.size(); i++){
-
-            }
             if (booleanDtoParant.isContainH1() &
                     moreTextThenOther.getCountKeyWordInClearText() > 0 &
                     moreTextThenOther.isContainH1()) {
@@ -209,7 +211,8 @@ public class Parser {
                         }
                     }
                 } else if (!booleanDtoChildList.get(positionMoreCleanText).isContainH1() &
-                        moreTextThenOther.getCountTextKeyWord() > 0) {
+                        moreTextThenOther.getCountTextKeyWord() > 0 |
+                        countH1H2 > 1 & moreTextThenOther.getCountTextKeyWord() > 0) {
                     int position = -1;
                     for (int i = 0; i < booleanDtoChildList.size(); i++) {
 
