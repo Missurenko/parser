@@ -21,7 +21,7 @@ public class Parser {
     private Element element;
     private List<String> keyWordList;
     private List<String> filterTag;
-
+    private int startEnd;
 
     public Parser(Element element, List<String> keyWordList, List<String> filterTag) {
         this.element = element;
@@ -134,11 +134,14 @@ public class Parser {
 
     private boolean htmlTagMetod(Element mainElement) {
         if (mainElement.tag().toString().equals("html")) {
+
             if (mainElement.getElementsByTag("h1").size() == 0 &
                     mainElement.getElementsByTag("h2").size() == 0) {
-                element = null;
-                System.out.println("Parser element set null");
-                return false;
+
+                    element = null;
+                    System.out.println("Parser element set null");
+                    return false;
+
             }
             if (!containKeyWord(mainElement)) {
                 element = null;
@@ -157,43 +160,47 @@ public class Parser {
         int lenghtTagA = 0;
         int lenghtClearText = 0;
         int falseFlag = 0;
-        int potion = -1;
+        int positionMoreCleanText = -1;
         for (int i = 0; i < booleanDtoChildList.size(); i++) {
             BooleanDto child = booleanDtoChildList.get(i);
             lenght = child.getTextLenght();
             lenghtTagA = child.getLenghtTextInATag();
             if (lenghtClearText < cleanText(lenght, lenghtTagA)) {
                 lenghtClearText = cleanText(lenght, lenghtTagA);
-                potion = i;
+                positionMoreCleanText = i;
             }
             result.add(true);
         }
         BooleanDto moreTextThenOther = new BooleanDto();
-        if (potion != -1) {
-            moreTextThenOther = booleanDtoChildList.get(potion);
+        if (positionMoreCleanText != -1) {
+            moreTextThenOther = booleanDtoChildList.get(positionMoreCleanText);
 
         }
         if (booleanDtoParant.getCountKeyWordInClearText() > 0) {
+            for(int i = 0; i < booleanDtoChildList.size(); i++){
+
+            }
             if (booleanDtoParant.isContainH1() &
                     moreTextThenOther.getCountKeyWordInClearText() > 0 &
                     moreTextThenOther.isContainH1()) {
-                result.set(potion, false);
+                result.set(positionMoreCleanText, false);
                 falseFlag++;
+
             } else if (moreTextThenOther.getLenghtTextInATag() >
                     moreTextThenOther.getTextLenght()) {
-                result.set(potion, true);
+                result.set(positionMoreCleanText, true);
             } else {
                 // maybe need first item shut down
-                if (booleanDtoChildList.get(potion).isContainH1()) {
-                    for (int i = 0; i < potion + 1; i++) {
+                if (booleanDtoChildList.get(positionMoreCleanText).isContainH1()) {
+                    for (int i = 0; i < positionMoreCleanText + 1; i++) {
                         result.set(i, false);
                         falseFlag++;
                     }
-                    if (result.size() > potion + 1) {
-                        result.set(potion + 1, false);
-                        falseFlag++;
-                    }
-                    for (int i = potion + 2; i < booleanDtoChildList.size(); i++) {
+//                    if (result.size() > positionMoreCleanText + 1) {
+//                        result.set(positionMoreCleanText + 1, false);
+//                        falseFlag++;
+//                    }
+                    for (int i = positionMoreCleanText + 2; i < booleanDtoChildList.size(); i++) {
                         if (cleanText(booleanDtoChildList.get(i).getTextLenght(),
                                 booleanDtoChildList.get(i).getLenghtTextInATag()) > 0) {
                             result.set(i, false);
@@ -201,23 +208,34 @@ public class Parser {
                             break;
                         }
                     }
+                } else if (!booleanDtoChildList.get(positionMoreCleanText).isContainH1() &
+                        moreTextThenOther.getCountTextKeyWord() > 0) {
+                    int position = -1;
+                    for (int i = 0; i < booleanDtoChildList.size(); i++) {
+
+                        if (booleanDtoChildList.get(i).isContainH1() &
+                                position == -1) {
+                            position = i;
+                        }
+                    }
+                    for (int i = position; i < positionMoreCleanText; i++) {
+                        result.set(i, false);
+                        falseFlag++;
+                    }
                 }
                 String ss = "ss";
             }
 
         }
         if (falseFlag > 1) {
-            for (BooleanDto child : booleanDtoChildList) {
-                lenght = child.getTextLenght();
-                lenghtTagA = child.getLenghtTextInATag();
+            for (int i = 0; i < booleanDtoChildList.size(); i++) {
+                lenght = booleanDtoChildList.get(i).getTextLenght();
+                lenghtTagA = booleanDtoChildList.get(i).getLenghtTextInATag();
                 lenghtClearText = lenght - lenghtTagA;
                 if (lenghtClearText < lenghtTagA) {
-                    for (int i = 0; i < result.size(); i++) {
-                        result.set(i, true);
-
-                    }
-                    result.set(potion, false);
+                    result.set(i, true);
                 }
+                result.set(positionMoreCleanText, false);
             }
         }
         int headSubject = -1;
@@ -228,7 +246,7 @@ public class Parser {
                         child.isContainH1()) {
                     headSubject = i;
                 }
-                if(headSubject != -1& potion != headSubject){
+                if (headSubject != -1 & positionMoreCleanText != headSubject) {
 
                 }
 

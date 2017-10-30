@@ -18,7 +18,7 @@ public class ReadTxtAndWriteForIngest {
     private String fromReadTxt = "url.txt";
     private String folder = "transfer";
     private String whereWrite = "file.html";
-    private List<String> keyWord = Arrays.asList("Украин");
+    private List<String> keyWord = Arrays.asList("Укр");
     private final List<String> TAG_FILTER = Arrays.asList("script", "noscript", "style");
 
 
@@ -33,23 +33,24 @@ public class ReadTxtAndWriteForIngest {
             System.out.println("Start work ReadTxtAndWriteForIngest doWhile");
             String dir = "";
 
-            String url = fileReadWrite.readConfigurationTxt(folder,fromReadTxt);
+            String url = fileReadWrite.readConfigurationTxt(folder, fromReadTxt);
 
             Document document = crownUrl.crown(url);
-            if(document == null){
+            if (document == null) {
                 fileReadWrite.writeToDir(whereWrite);
-            }
-            Element allElement = document.getAllElements().first();
-            Parser parser = new Parser(allElement, keyWord, TAG_FILTER);
-            System.out.println("Parsed element");
-            Element parseredOrigin = parser.start();
+            }else {
+                Element allElement = document.getAllElements().first();
+                Parser parser = new Parser(allElement, keyWord, TAG_FILTER);
+                System.out.println("Parsed element");
+                Element parseredOrigin = parser.start();
 
-            if (parseredOrigin == null) {
-                fileReadWrite.writeToDir(whereWrite);
-                System.out.println("Element == null");
-            } else {
-                String path = folder.concat("/"+whereWrite);
-                fileReadWrite.writeToDir(parseredOrigin, path);
+                if (parseredOrigin == null) {
+                    fileReadWrite.writeToDir(whereWrite);
+                    System.out.println("Element == null");
+                } else {
+                    String path = folder.concat("/" + whereWrite);
+                    fileReadWrite.writeToDir(parseredOrigin, path);
+                }
             }
         } while (true);
 

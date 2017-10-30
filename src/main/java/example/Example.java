@@ -1,19 +1,26 @@
 package example;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import service.impl.FileReadWriteImpl;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.jsoup.nodes.Document;
+
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.InputStreamReader;
 import java.util.Date;
-import java.util.List;
+
+import static org.apache.http.protocol.HTTP.USER_AGENT;
+
 
 public class Example {
     public static void main(String[] args) throws IOException {
         System.out.println(new Date());
+        crown("ss");
 
-//
 //        int i = 0;
 //        int j = 0;
 //        List<Document> docsList = new ArrayList();
@@ -44,30 +51,50 @@ public class Example {
     }
 
 
-    Document crown(String urlRead) {
+    static Document crown(String urlRead) {
 
-        Document result = null;
+       urlRead = "https://www.mkyong.com/java/apache-httpclient-examples/";
+
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet(urlRead);
+
+// add request header
+
+        HttpResponse response = null;
         try {
-            Document doc = Jsoup.connect(urlRead)
-                    .followRedirects(true)
-                    .ignoreContentType(true)
-                    .timeout(12000) // optional
-                    .header("Accept-Language", "pt-BR,pt;q=0.8") // missing
-                    .header("Accept-Encoding", "gzip,deflate,sdch") // missing
-                    .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.107 Safari/537.36") // missing
-                    .referrer("http://www.google.com") // optional
-                    .execute()
-                    .parse();
-//            String ss = "ss";
-//            FileReadWriteImpl writer = new FileReadWriteImpl();
-//            writer.writeToDir(doc, "1", "2", "example.html");
+            response = client.execute(request);
+        } catch (IOException e) {
+            return null;
+        }
 
-            doc = result;
+        System.out.println("Response Code : "
+                + response.getStatusLine().getStatusCode());
+        Document document = null;
+        try {
+            document = new Document(EntityUtils.toString(response.getEntity()));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return result;
-    }
 
+        BufferedReader rd = null;
+        try {
+            rd = new BufferedReader(
+                    new InputStreamReader(response.getEntity().getContent()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        StringBuffer result = new StringBuffer();
+        String line = "";
+        try {
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
+
 
