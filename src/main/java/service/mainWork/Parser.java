@@ -115,19 +115,43 @@ public class Parser {
 
         deleteOnly(mainElement, whatDelete);
         int countForEnd = 0;
-        for (Element child : mainElement.children()) {
-            if (!child.tag().toString().equals("head")) {
-                countForEnd++;
+
+        // count false flag for know go deap or not
+        int coutnFalseGoDeepOrNot = 0;
+        // all childs flag delete or not
+        for (boolean flagChild : deleteBlockList) {
+            if (!flagChild) {
+                coutnFalseGoDeepOrNot++;
             }
         }
 
-        if (countForEnd < 2 & htmlTagMetod(mainElement)) {
+        // if have head allweys 1 and if have
+        if (mainElement.child(0).tag().toString().equals("head") & coutnFalseGoDeepOrNot > 0) {
+            coutnFalseGoDeepOrNot = 1;
+        }
+        // if we have one child this undestand what I have one our block
+        if (coutnFalseGoDeepOrNot == 1) {
             for (Element child : mainElement.children()) {
+                // head can be changed in future can be delete or another
                 if (!child.tag().toString().equals("head")) {
                     recursiveMetod(child);
                 }
             }
         }
+
+//        for (Element child : mainElement.children()) {
+//            if (!child.tag().toString().equals("head")) {
+//                countForEnd++;
+//            }
+//        }
+//
+//        if (countForEnd < 2 & htmlTagMetod(mainElement)) {
+//            for (Element child : mainElement.children()) {
+//                if (!child.tag().toString().equals("head")) {
+//                    recursiveMetod(child);
+//                }
+//            }
+//        }
 
 
     }
@@ -161,6 +185,7 @@ public class Parser {
         int lenghtClearText = 0;
         int falseFlag = 0;
         int positionMoreCleanText = -1;
+        int firstPositionH1 = -1;
         int countH1H2 = 0;
         for (int i = 0; i < booleanDtoChildList.size(); i++) {
             BooleanDto child = booleanDtoChildList.get(i);
@@ -172,6 +197,9 @@ public class Parser {
             }
             if (child.isContainH1()) {
                 countH1H2++;
+                if (firstPositionH1 == -1) {
+                    firstPositionH1 = i;
+                }
             }
 
             result.add(true);
@@ -181,81 +209,117 @@ public class Parser {
             moreTextThenOther = booleanDtoChildList.get(positionMoreCleanText);
 
         }
+        // if have key words in text Clear
         if (booleanDtoParant.getCountKeyWordInClearText() > 0) {
-            if (booleanDtoParant.isContainH1() &
-                    moreTextThenOther.getCountKeyWordInClearText() > 0 &
-                    moreTextThenOther.isContainH1()) {
-                result.set(positionMoreCleanText, false);
-                falseFlag++;
 
-            } else if (moreTextThenOther.getLenghtTextInATag() >
-                    moreTextThenOther.getTextLenght()) {
-                result.set(positionMoreCleanText, true);
-            } else {
-                // maybe need first item shut down
-                if (booleanDtoChildList.get(positionMoreCleanText).isContainH1()) {
-                    for (int i = 0; i < positionMoreCleanText + 1; i++) {
+
+            if (countH1H2 == 1) {
+                // page this one h1 set for block
+                if (booleanDtoParant.isContainH1() &
+                        moreTextThenOther.getCountKeyWordInClearText() > 0 &
+                        moreTextThenOther.isContainH1()) {
+                    result.set(positionMoreCleanText, false);
+                    falseFlag++;
+                }
+                // if no have block set false for all between headH1 and moreClean text
+                if (result.get(positionMoreCleanText) & falseFlag == 0) {
+                    for (int i = firstPositionH1; i < positionMoreCleanText + 1; i++) {
+                        // think here do recurthin more deep
                         result.set(i, false);
                         falseFlag++;
                     }
+                    // if have clean text more then text like <a hread
+                    boolean end = false;
+                    for (int i = positionMoreCleanText + 1; i < result.size() + 1; i++) {
+                        BooleanDto child = booleanDtoChildList.get(i);
+
+                        if (child.getLenghtClearText() > child.getKeyWordInTagA() &
+                                !end) {
+                            result.set(i, false);
+                            falseFlag++;
+                        } else {
+                            end = true;
+                        }
+                    }
+                }
+
+
+            }
+        } else {
+            return result;
+        }
+//            if (booleanDtoParant.isContainH1() &
+//                    moreTextThenOther.getCountKeyWordInClearText() > 0 &
+//                    moreTextThenOther.isContainH1()) {
+//                result.set(positionMoreCleanText, false);
+//                falseFlag++;
+//
+//            } else {
+//                // maybe need first item shut down
+//                if (booleanDtoChildList.get(positionMoreCleanText).isContainH1()) {
+//                    for (int i = 0; i < positionMoreCleanText + 1; i++) {
+//                        result.set(i, false);
+//                        falseFlag++;
+//                    }
 //                    if (result.size() > positionMoreCleanText + 1) {
 //                        result.set(positionMoreCleanText + 1, false);
 //                        falseFlag++;
 //                    }
-                    for (int i = positionMoreCleanText + 2; i < booleanDtoChildList.size(); i++) {
-                        if (cleanText(booleanDtoChildList.get(i).getTextLenght(),
-                                booleanDtoChildList.get(i).getLenghtTextInATag()) > 0) {
-                            result.set(i, false);
-                        } else {
-                            break;
-                        }
-                    }
-                } else if (!booleanDtoChildList.get(positionMoreCleanText).isContainH1() &
-                        moreTextThenOther.getCountTextKeyWord() > 0 |
-                        countH1H2 > 1 & moreTextThenOther.getCountTextKeyWord() > 0) {
-                    int position = -1;
-                    for (int i = 0; i < booleanDtoChildList.size(); i++) {
+//                    for (int i = positionMoreCleanText + 2; i < booleanDtoChildList.size(); i++) {
+//                        if (cleanText(booleanDtoChildList.get(i).getTextLenght(),
+//                                booleanDtoChildList.get(i).getLenghtTextInATag()) > 0) {
+//                            result.set(i, false);
+//                        } else {
+//                            break;
+//                        }
+//                    }
+//                } else if (!booleanDtoChildList.get(positionMoreCleanText).isContainH1() &
+//                        moreTextThenOther.getCountTextKeyWord() > 0 |
+//                        countH1H2 > 1 & moreTextThenOther.getCountTextKeyWord() > 0) {
+//                    int position = -1;
+//                    for (int i = 0; i < booleanDtoChildList.size(); i++) {
+//
+//                        if (booleanDtoChildList.get(i).isContainH1() &
+//                                position == -1) {
+//                            position = i;
+//                        }
+//                    }
+//                    for (int i = position; i < positionMoreCleanText; i++) {
+//                        result.set(i, false);
+//                        falseFlag++;
+//                    }
+//                }
+//                String ss = "ss";
+//            }
+//
+//        } // false and all remove
+//
+//        if (falseFlag > 1) {
+//            for (int i = 0; i < booleanDtoChildList.size(); i++) {
+//                lenght = booleanDtoChildList.get(i).getTextLenght();
+//                lenghtTagA = booleanDtoChildList.get(i).getLenghtTextInATag();
+//                lenghtClearText = lenght - lenghtTagA;
+//                if (lenghtClearText < lenghtTagA) {
+//                    result.set(i, true);
+//                }
+//                result.set(positionMoreCleanText, false);
+//            }
+//        }
+//        int headSubject = -1;
+//        if (falseFlag == 1) {
+//            for (int i = 0; i < booleanDtoChildList.size(); i++) {
+//                BooleanDto child = booleanDtoChildList.get(i);
+//                if (child.getCountKeyWordInClearText() > 0 &
+//                        child.isContainH1()) {
+//                    headSubject = i;
+//                }
+//                if (headSubject != -1 & positionMoreCleanText != headSubject) {
+//
+//                }
+//
+//
+//            }
 
-                        if (booleanDtoChildList.get(i).isContainH1() &
-                                position == -1) {
-                            position = i;
-                        }
-                    }
-                    for (int i = position; i < positionMoreCleanText; i++) {
-                        result.set(i, false);
-                        falseFlag++;
-                    }
-                }
-                String ss = "ss";
-            }
-
-        }
-        if (falseFlag > 1) {
-            for (int i = 0; i < booleanDtoChildList.size(); i++) {
-                lenght = booleanDtoChildList.get(i).getTextLenght();
-                lenghtTagA = booleanDtoChildList.get(i).getLenghtTextInATag();
-                lenghtClearText = lenght - lenghtTagA;
-                if (lenghtClearText < lenghtTagA) {
-                    result.set(i, true);
-                }
-                result.set(positionMoreCleanText, false);
-            }
-        }
-        int headSubject = -1;
-        if (falseFlag == 1) {
-            for (int i = 0; i < booleanDtoChildList.size(); i++) {
-                BooleanDto child = booleanDtoChildList.get(i);
-                if (child.getCountKeyWordInClearText() > 0 &
-                        child.isContainH1()) {
-                    headSubject = i;
-                }
-                if (headSubject != -1 & positionMoreCleanText != headSubject) {
-
-                }
-
-
-            }
-        }
         return result;
     }
 
