@@ -107,7 +107,7 @@ public class Parser {
                     booleanDtoChilds.add(childDto);
                 }
 
-
+// return list true false what need delete
                 whatDelete = flagForDalete(booleanDtoParant, booleanDtoChilds, mainElement);
 
             }
@@ -116,42 +116,43 @@ public class Parser {
         deleteOnly(mainElement, whatDelete);
         int countForEnd = 0;
 
-        // count false flag for know go deap or not
-        int coutnFalseGoDeepOrNot = 0;
-        // all childs flag delete or not
-        for (boolean flagChild : deleteBlockList) {
-            if (!flagChild) {
-                coutnFalseGoDeepOrNot++;
-            }
-        }
-
-        // if have head allweys 1 and if have
-        if (mainElement.child(0).tag().toString().equals("head") & coutnFalseGoDeepOrNot > 0) {
-            coutnFalseGoDeepOrNot = 1;
-        }
-        // if we have one child this undestand what I have one our block
-        if (coutnFalseGoDeepOrNot == 1) {
-            for (Element child : mainElement.children()) {
-                // head can be changed in future can be delete or another
-                if (!child.tag().toString().equals("head")) {
-                    recursiveMetod(child);
-                }
-            }
-        }
-
-//        for (Element child : mainElement.children()) {
-//            if (!child.tag().toString().equals("head")) {
-//                countForEnd++;
+//        // count false flag for know go deap or not
+//        int coutnFalseGoDeepOrNot = 0;
+//        // all childs flag delete or not
+//        for (boolean flagChild : deleteBlockList) {
+//            if (!flagChild) {
+//                coutnFalseGoDeepOrNot++;
 //            }
 //        }
 //
-//        if (countForEnd < 2 & htmlTagMetod(mainElement)) {
+//        // if have head allweys 1 and if have
+//        if (mainElement.child(0).tag().toString().equals("head") & coutnFalseGoDeepOrNot > 0) {
+//            coutnFalseGoDeepOrNot = 1;
+//        }
+//        // if we have one child this undestand need go more deep and your have one block what you need
+//        if (coutnFalseGoDeepOrNot == 1) {
 //            for (Element child : mainElement.children()) {
+//                // head can be changed in future can be delete or another
 //                if (!child.tag().toString().equals("head")) {
 //                    recursiveMetod(child);
 //                }
 //            }
 //        }
+
+        // this cout how many stay child in main element and if you have more then two go deeper
+        for (Element child : mainElement.children()) {
+            if (!child.tag().toString().equals("head")) {
+                countForEnd++;
+            }
+        }
+// tommorow need understand why no work this part of code
+        if (countForEnd < 2 & htmlTagMetod(mainElement)) {
+            for (Element child : mainElement.children()) {
+                if (!child.tag().toString().equals("head")) {
+                    recursiveMetod(child);
+                }
+            }
+        }
 
 
     }
@@ -327,6 +328,7 @@ public class Parser {
         return lenghtAllText - lenghtTextTagA;
     }
 
+    // this metod count all position what can be use for understand about what block need stay alive
     private BooleanDto booleanMetodGlobal(Element mainElement) {
         BooleanDto booleanDto = new BooleanDto();
 
