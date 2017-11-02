@@ -65,7 +65,6 @@ public class Parser {
     }
 
 
-
     private void shortRecursive(Element mainElement) {
         deleteMetod(mainElement);
         for (Element child : mainElement.children()) {
@@ -179,9 +178,10 @@ public class Parser {
 
     }
 
-    private List<Boolean> flagForDalete(BooleanDto
-                                                booleanDtoParant, List<BooleanDto> booleanDtoChildList, Element mainElement) {
+    // основной метод для виставление флагов чтоб потом удалить
+    private List<Boolean> flagForDalete(BooleanDto booleanDtoParant, List<BooleanDto> booleanDtoChildList, Element mainElement) {
         List<Boolean> result = new ArrayList<>();
+
         int lenght = 0;
         int lenghtTagA = 0;
         int lenghtClearText = 0;
@@ -193,48 +193,55 @@ public class Parser {
             BooleanDto child = booleanDtoChildList.get(i);
             lenght = child.getTextLenght();
             lenghtTagA = child.getLenghtTextInATag();
+            // если чистого текста больше чем позиции с чистим текстом ставим такую позицию
             if (lenghtClearText < cleanText(lenght, lenghtTagA)) {
                 lenghtClearText = cleanText(lenght, lenghtTagA);
                 positionMoreCleanText = i;
             }
+            // если содержит Н1 или Н2 то ставим позицию
             if (child.isContainH1()) {
                 countH1H2++;
                 if (firstPositionH1 == -1) {
                     firstPositionH1 = i;
                 }
             }
-
+// и по дефолту добавляем true
             result.add(true);
         }
         BooleanDto moreTextThenOther = new BooleanDto();
+        // если позиция больше всего текста не есть -1 то ставим позицию
         if (positionMoreCleanText != -1) {
             moreTextThenOther = booleanDtoChildList.get(positionMoreCleanText);
 
         }
-        // if have key words in text Clear
+        // если содержит ключевое словл
         if (booleanDtoParant.getCountKeyWordInClearText() > 0) {
 
-
+            // если имеим один Н1 то действуем
             if (countH1H2 == 1) {
                 // page this one h1 set for block
+                // если содержит H1 и больше всего ключевих слов наверно взял снизу
                 if (booleanDtoParant.isContainH1() &
                         moreTextThenOther.getCountKeyWordInClearText() > 0 &
                         moreTextThenOther.isContainH1()) {
                     result.set(positionMoreCleanText, false);
                     falseFlag++;
                 }
-                // if no have block set false for all between headH1 and moreClean text
+                // если позиция с больше всего текстом true и флагов с false 0 то
                 if (result.get(positionMoreCleanText) & falseFlag == 0) {
                     for (int i = firstPositionH1; i < positionMoreCleanText + 1; i++) {
+                        // TODO сделать рекурсию для удаление все наследников с тагом <a
                         // think here do recurthin more deep
                         result.set(i, false);
                         falseFlag++;
                     }
-                    // if have clean text more then text like <a hread
+
                     boolean end = false;
                     for (int i = positionMoreCleanText + 1; i < result.size() + 1; i++) {
                         BooleanDto child = booleanDtoChildList.get(i);
-
+                        // если чистого текста больше чем ключевих слов в тагазх ???
+                        // TODO изменить сдесь хрень полнейшая
+                        //
                         if (child.getLenghtClearText() > child.getKeyWordInTagA() &
                                 !end) {
                             result.set(i, false);
@@ -250,81 +257,80 @@ public class Parser {
         } else {
             return result;
         }
-//            if (booleanDtoParant.isContainH1() &
-//                    moreTextThenOther.getCountKeyWordInClearText() > 0 &
-//                    moreTextThenOther.isContainH1()) {
-//                result.set(positionMoreCleanText, false);
-//                falseFlag++;
-//
-//            } else {
-//                // maybe need first item shut down
-//                if (booleanDtoChildList.get(positionMoreCleanText).isContainH1()) {
-//                    for (int i = 0; i < positionMoreCleanText + 1; i++) {
-//                        result.set(i, false);
-//                        falseFlag++;
-//                    }
-//                    if (result.size() > positionMoreCleanText + 1) {
-//                        result.set(positionMoreCleanText + 1, false);
-//                        falseFlag++;
-//                    }
-//                    for (int i = positionMoreCleanText + 2; i < booleanDtoChildList.size(); i++) {
-//                        if (cleanText(booleanDtoChildList.get(i).getTextLenght(),
-//                                booleanDtoChildList.get(i).getLenghtTextInATag()) > 0) {
-//                            result.set(i, false);
-//                        } else {
-//                            break;
-//                        }
-//                    }
-//                } else if (!booleanDtoChildList.get(positionMoreCleanText).isContainH1() &
-//                        moreTextThenOther.getCountTextKeyWord() > 0 |
-//                        countH1H2 > 1 & moreTextThenOther.getCountTextKeyWord() > 0) {
-//                    int position = -1;
-//                    for (int i = 0; i < booleanDtoChildList.size(); i++) {
-//
-//                        if (booleanDtoChildList.get(i).isContainH1() &
-//                                position == -1) {
-//                            position = i;
-//                        }
-//                    }
-//                    for (int i = position; i < positionMoreCleanText; i++) {
-//                        result.set(i, false);
-//                        falseFlag++;
-//                    }
-//                }
-//                String ss = "ss";
-//            }
-//
-//        } // false and all remove
-//
-//        if (falseFlag > 1) {
-//            for (int i = 0; i < booleanDtoChildList.size(); i++) {
-//                lenght = booleanDtoChildList.get(i).getTextLenght();
-//                lenghtTagA = booleanDtoChildList.get(i).getLenghtTextInATag();
-//                lenghtClearText = lenght - lenghtTagA;
-//                if (lenghtClearText < lenghtTagA) {
-//                    result.set(i, true);
-//                }
-//                result.set(positionMoreCleanText, false);
-//            }
-//        }
-//        int headSubject = -1;
-//        if (falseFlag == 1) {
-//            for (int i = 0; i < booleanDtoChildList.size(); i++) {
-//                BooleanDto child = booleanDtoChildList.get(i);
-//                if (child.getCountKeyWordInClearText() > 0 &
-//                        child.isContainH1()) {
-//                    headSubject = i;
-//                }
-//                if (headSubject != -1 & positionMoreCleanText != headSubject) {
-//
-//                }
-//
-//
-//            }
+        // if тут ждем разделение пока не разделиться Н1 и больше всего чистого текста
+        if (booleanDtoParant.isContainH1() &
+                moreTextThenOther.getCountKeyWordInClearText() > 0 &
+                moreTextThenOther.isContainH1()) {
+            result.set(positionMoreCleanText, false);
+            falseFlag++;
 
+        } else {
+            // если наследник имее Н! и больше всего текста  протеворечит верхнему
+            if (booleanDtoChildList.get(positionMoreCleanText).isContainH1()) {
+                for (int i = 0; i < positionMoreCleanText + 1; i++) {
+                    result.set(i, false);
+                    falseFlag++;
+                }
+                // если больше всего текста находиться на позииции меньше чем максимальная длина наследников +1 думаю убрать
+                if (result.size() > positionMoreCleanText + 1) {
+                    result.set(positionMoreCleanText + 1, false);
+                    falseFlag++;
+                }
+                // фор сделан глупо если  переделать в последствии на рекурсию если чистго текста меньше чем с а
+                for (int i = positionMoreCleanText + 2; i < booleanDtoChildList.size(); i++) {
+                    if (cleanText(booleanDtoChildList.get(i).getTextLenght(),
+                            booleanDtoChildList.get(i).getLenghtTextInATag()) > 0) {
+                        result.set(i, false);
+                    } else {
+                        break;
+                    }
+                }
+                // если Там где бальше всего текста содержит Н1 и
+                // и больше всего текста содержит ключевих слов больше 0
+                // ищем первую позицию где есть Н1 нужно подумать как использивать
+            } else if (!booleanDtoChildList.get(positionMoreCleanText).isContainH1() &
+                    moreTextThenOther.getCountTextKeyWord() > 0 |
+                    countH1H2 > 1 & moreTextThenOther.getCountTextKeyWord() > 0) {
+                int position = -1;
+                for (int i = 0; i < booleanDtoChildList.size(); i++) {
+
+                    if (booleanDtoChildList.get(i).isContainH1() &
+                            position == -1) {
+                        position = i;
+                    }
+                }
+                // фолсе между больше всего текста и Н1 Думаю нужно просто дойти до разделение и рекурсией убрать все <a таг
+                for (int i = position; i < positionMoreCleanText; i++) {
+                    result.set(i, false);
+                    falseFlag++;
+                }
+            }
+            String ss = "ss";
+        }
+
+
+        //сли фолсе флаг больше 0
+        if (falseFlag > 1) {
+            for (int i = 0; i < booleanDtoChildList.size(); i++) {
+                // зачемто беру длину
+                // длину <a таг
+                // и длину чистого текста
+                //  и сечу значения
+                lenght = booleanDtoChildList.get(i).getTextLenght();
+                lenghtTagA = booleanDtoChildList.get(i).getLenghtTextInATag();
+                lenghtClearText = lenght - lenghtTagA;
+                // и если чистого тексста меньше то ставлю фолсе
+                if (lenghtClearText < lenghtTagA) {
+                    result.set(i, true);
+                }
+                result.set(positionMoreCleanText, false);
+            }
+        }
         return result;
     }
 
+    // если длина всего текста длинне чем текс в тагах хрень собачья
+    // TODO изменить на чистий текст и таг <a
     private int cleanText(int lenghtAllText, int lenghtTextTagA) {
         return lenghtAllText - lenghtTextTagA;
     }
@@ -339,33 +345,37 @@ public class Parser {
         booleanDto.setContainH1(containH1Orh2(mainElement));
         booleanDto.setContaineImage(containeImage(mainElement));
         booleanDto.setContainIframeVideo(containIframeVideo(mainElement));
-        if (!noHaveDateFlag(mainElement)) {
-            booleanDto.setContainDate(true);
-        }
+
+//        if (!noHaveDateFlag(mainElement)) {
+//            booleanDto.setContainDate(true);
+//        }
         countForBoolen(mainElement, booleanDto);
         booleanDto.setTextLenght(mainElement.text().length());
         return booleanDto;
     }
 
 
+    // если у хотяби одного наследника есть н1 н2 то будет true
     private boolean containH1Orh2(Element element) {
         return element.getElementsByTag("h1").size() != 0 |
                 element.getElementsByTag("h2").size() != 0;
     }
 
+    // если у хотяби одного наследника есть img то будет true
     private boolean containeImage(Element element) {
         return element.getElementsByTag("img").size() != 0;
     }
 
+    // если у хотяби одного наследника есть iframe то будет true  думаю удалить
     private boolean containIframeVideo(Element element) {
         return element.getElementsByTag("iframe").size() != 0;
     }
 
-    // do change for text count
+    // метод которий считает таг keyWord Text and other
     private void countForBoolen(Element element, BooleanDto booleanDto) {
 
         Element clone = element.clone();
-        List<Element> elementDepthOne = recursiveMetodDeleteAllChildNode(clone, new ArrayList<>());
+        List<Element> elementDepthOne = recursiveMetodGetAllChildByDepth0(clone, new ArrayList<>());
         int countTagA = 0;
         int countTextKeyWord = 0;
         int containText = 0;
@@ -374,29 +384,30 @@ public class Parser {
         int lenghtClearText = 0;
         int countClearTextKeyWord = 0;
 
-        int number = 0;
+
         for (Element byOneDepthToEnd : elementDepthOne) {
-            number++;
-            if (number == 20) {
-                int numbesr = 0;
-            }
             RecursiaForTagADto checkTagA = new RecursiaForTagADto();
             checkTagA.setElement(byOneDepthToEnd);
+
+            // если содержит таг а на глубину 3
             if (containTagAByThreeDepth(checkTagA)) {
                 lenghtTextInATagLenght += byOneDepthToEnd.text().length();
                 countTagA++;
+                // ксли содержит дополнительно ключевое слово
                 if (containKeyWord(byOneDepthToEnd)) {
                     keyWordInTagA++;
                 }
+                //  нет на глубине 3
             } else {
+                // длина всего текста
                 lenghtClearText += byOneDepthToEnd.text().length();
                 if (containKeyWord(byOneDepthToEnd)) {
                     countClearTextKeyWord++;
                 }
             }
+            // текст считаю по пробелам
             if (!Objects.equals(byOneDepthToEnd.text(), "")) {
-//                    Pattern pattern2 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]) ([^\\s]) ((19|20)\\d\\d)");
-//                    Elements elements = byOneDepthToEnd.getElementsMatchingText(pattern2);
+
                 containText++;
             }
             if (containKeyWord(byOneDepthToEnd)) {
@@ -413,13 +424,16 @@ public class Parser {
         booleanDto.setLenghtTextInATag(lenghtTextInATagLenght);
     }
 
+    // если родитель содержит таг и имеиит родителя
     private boolean containParantThisTagA(Element element) {
         return null != element.parent() &
                 element.tag().toString().equals("a");
 
     }
 
+    // ищем содержимое <a таг
     private boolean containTagAByThreeDepth(RecursiaForTagADto recursiaForTagADto) {
+// если глубина 3
         if (recursiaForTagADto.getCountDepth() == 3) {
             return false;
         } else {
@@ -441,14 +455,7 @@ public class Parser {
 
     }
 
-    // think delete
-    private void recursiveMetodClone(Element mainElement) {
-        deleteMetod(mainElement);
-        for (Element child : mainElement.children()) {
-            recursiveMetodClone(child);
-        }
-    }
-
+    // содержит ли ключевие слова
     private boolean containKeyWord(Element element) {
         for (String keyWord : keyWordList) {
             if (element.text().contains(keyWord)) {
@@ -463,35 +470,10 @@ public class Parser {
 //        return child.getElementsByTag("link").size() != 0;
 //    }
 
-    // delete
-
-    private boolean leaveItOrNot(Element clone) {
-        List<Element> elementDepthOne = recursiveMetodDeleteAllChildNode(clone, new ArrayList<>());
-
-
-        List<Boolean> deleteOrNot = new ArrayList<>();
-        String ss = "ss";
-
-        for (Element byOneDepthToEnd : elementDepthOne) {
-            String sss = "ss";
-            if (byOneDepthToEnd.tag().toString().equals("a")) {
-                deleteOrNot.add(true);
-            } else {
-                deleteOrNot.add(false);
-            }
-        }
-
-        int count = 0;
-        for (Boolean isBe : deleteOrNot) {
-            if (!isBe) {
-                count++;
-            }
-        }
-        return count >= 1;
-
-    }
-
-    private List<Element> recursiveMetodDeleteAllChildNode(Element element, List<Element> listOneDepthElem) {
+    // TODO возможно поменять на дерево
+    // не очень ефективний способ получить всех наследников
+    private List<Element> recursiveMetodGetAllChildByDepth0(Element element, List<Element> listOneDepthElem) {
+        // получаем все наследников
         List<Element> supportListElem = element.children();
         if (supportListElem.size() == 0) {
             listOneDepthElem.add(element);
@@ -499,7 +481,9 @@ public class Parser {
         for (Element child : element.children()) {
 
             String ss = "ss";
-            List<Element> oneDepthElement = recursiveMetodDeleteAllChildNode(child, new ArrayList<>());
+            // список елементи одной глубини
+            List<Element> oneDepthElement = recursiveMetodGetAllChildByDepth0(child, new ArrayList<>());
+            // идем и собираем всех возможно переделать на дерево всетаки будет проще
             if (oneDepthElement.size() > 0) {
                 listOneDepthElem.addAll(oneDepthElement);
             }
@@ -508,7 +492,8 @@ public class Parser {
         return listOneDepthElem;
     }
 
-    // need change
+    // TODO Оставлять всю верхушку
+    // флаг для оставления линков
     private boolean getFlagDeleteByFilters(Element child, Element parant) {
         boolean flag = true;
         // if contain tag script,noscript, style
@@ -524,6 +509,7 @@ public class Parser {
     }
 
 
+    // удаляет все из списка тагов
     private boolean flagDeleteNoNeedTags(Element element) {
         for (String string : filterTag) {
             if (element.tag().toString().equals(string)) {
@@ -532,50 +518,51 @@ public class Parser {
         }
         return false;
     }
-
-    // can be change
-    private boolean noHaveDateFlag(Element child) {
-
-        List<Pattern> patternList = new ArrayList<>();
-        // TODO find or do some more pattern this date
-        Pattern pattern0 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)");
-        Pattern pattern1 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]).(0?[1-9]|1[012]).((19|20)\\d\\d)");
-        Pattern pattern2 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]) ([^\\s]) ((19|20)\\d\\d)");
-
-        patternList.add(pattern0);
-        patternList.add(pattern1);
-        //Here we find all document elements which have some element with the searched pattern
-        for (Pattern pattern : patternList) {
-            Elements elements = child.getElementsMatchingText(pattern);
-            if (elements.size() != 0) {
-                return false;
-            }
-//                    List<Element> finalElements = elements.stream().filter(elem -> isLastElem(elem, pattern)).collect(Collectors.toList());
-//                    finalElements.stream().forEach(elem ->
-//                            System.out.println("Node: " + elem.html())
-//                    );
-//                    String ss = "ss";
-        }
-        return true;
-    }
-
-    // use for doc in other location
-    public boolean containKeyWordInDoc(Document doc, List<String> keyWords) {
-        for (String keyWord : keyWords) {
-            if (doc.text().contains(keyWord)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean noContainKeyWordInElement(Element element, List<String> keyWords) {
-        for (String keyWord : keyWords) {
-            if (element.text().contains(keyWord)) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
+
+//    // can be change
+//    private boolean noHaveDateFlag(Element child) {
+//
+//        List<Pattern> patternList = new ArrayList<>();
+//        // TODO find or do some more pattern this date
+//        Pattern pattern0 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)");
+//        Pattern pattern1 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]).(0?[1-9]|1[012]).((19|20)\\d\\d)");
+//        Pattern pattern2 = Pattern.compile("(0?[1-9]|[12][0-9]|3[01]) ([^\\s]) ((19|20)\\d\\d)");
+//
+//        patternList.add(pattern0);
+//        patternList.add(pattern1);
+//        //Here we find all document elements which have some element with the searched pattern
+//        for (Pattern pattern : patternList) {
+//            Elements elements = child.getElementsMatchingText(pattern);
+//            if (elements.size() != 0) {
+//                return false;
+//            }
+////                    List<Element> finalElements = elements.stream().filter(elem -> isLastElem(elem, pattern)).collect(Collectors.toList());
+////                    finalElements.stream().forEach(elem ->
+////                            System.out.println("Node: " + elem.html())
+////                    );
+////                    String ss = "ss";
+//        }
+//        return true;
+//    }
+//
+//    // use for doc in other location
+//    public boolean containKeyWordInDoc(Document doc, List<String> keyWords) {
+//        for (String keyWord : keyWords) {
+//            if (doc.text().contains(keyWord)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    private boolean noContainKeyWordInElement(Element element, List<String> keyWords) {
+//        for (String keyWord : keyWords) {
+//            if (element.text().contains(keyWord)) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
+
 
