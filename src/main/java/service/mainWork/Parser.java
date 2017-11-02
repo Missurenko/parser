@@ -54,6 +54,7 @@ public class Parser {
         }
     }
 
+
     private void deleteOnly(Element mainElement, List<Boolean> whatDelete) {
         for (int i = whatDelete.size() - 1; i >= 0; --i) {
             if (whatDelete.get(i)) {
@@ -64,8 +65,8 @@ public class Parser {
     }
 
 
-    private void shortRecursive(Element mainElement) {
 
+    private void shortRecursive(Element mainElement) {
         deleteMetod(mainElement);
         for (Element child : mainElement.children()) {
             shortRecursive(child);
