@@ -29,7 +29,7 @@ public class GreetingServer extends Thread {
                 byte[] bytes = IOUtils.toByteArray(inSR);
                 String s = new String(bytes, "US-ASCII");
 
-                Socket client = new Socket("192.168.1.101", 7000);
+                Socket client = new Socket("localhost", 7000);
 
                 System.out.println("Just connected to " + client.getRemoteSocketAddress());
                 OutputStream outToServer = client.getOutputStream();
