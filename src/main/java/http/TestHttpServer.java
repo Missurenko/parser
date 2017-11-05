@@ -1,18 +1,18 @@
 package http;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import lombok.Data;
+
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+@Data
 public class TestHttpServer {
-    public int port = 5555;
+    public int inputPort = 5555;
     public TestHttpClient httpClient;
 
-    public TestHttpServer(int port, TestHttpClient httpClient) {
-        this.port = port;
+    public TestHttpServer(int inputPort, TestHttpClient httpClient) {
+        this.inputPort = inputPort;
         this.httpClient = httpClient;
     }
 
@@ -21,62 +21,21 @@ public class TestHttpServer {
         while (true) {
             Socket s = ss.accept();
             System.err.println("Client accepted");
-            new Thread(new SocketProcessor(s)).start();
+            SocketProcessor socketProcessor = new SocketProcessor(s);
+            new Thread(socketProcessor).start();
         }
     }
 
-    private static class SocketProcessor implements Runnable {
-
-        private Socket s;
-        private InputStream is;
-        private OutputStream os;
-
-        private SocketProcessor(Socket s) throws Throwable {
-            this.s = s;
-            this.is = s.getInputStream();
-            this.os = s.getOutputStream();
-        }
-
-        public void run() {
-            try {
-                readInputHeaders();
-                writeResponse("<html><body><h1>Hello from Habrahabr</h1></body></html>");
-            } catch (Throwable t) {
-                /*do nothing*/
-            } finally {
-                try {
-                    s.close();
-                } catch (Throwable t) {
-                    /*do nothing*/
-                }
-            }
-            System.err.println("Client processing finished");
-        }
-
-        private void writeResponse(String s) throws Throwable {
-            String response = "HTTP/1.1 200 OK\r\n" +
-                    "Server: YarServer/2009-09-09\r\n" +
-                    "Content-Type: text/html\r\n" +
-                    "Content-Length: " + s.length() + "\r\n" +
-                    "Connection: close\r\n\r\n";
-            String result = response + s;
-            os.write(result.getBytes());
-            os.flush();
-        }
-
-        private void readInputHeaders() throws Throwable {
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            StringBuilder stringBuilder = new StringBuilder();
-            while (true) {
-                String readLine = br.readLine();
-                System.out.println(readLine);
-                if (readLine == null || readLine.trim().length() == 0) {
-                    break;
-                } else {
-                    stringBuilder.append(readLine);
-                }
-            }
-//            System.out.println(stringBuilder);
+    public void start() throws Throwable {
+        ServerSocket ss = new ServerSocket(this.inputPort);
+        System.err.println("Start server");
+        while (true) {
+            Socket s = ss.accept();
+            System.err.println("Client accepted");
+            SocketProcessor socketProcessor = new SocketProcessor(s);
+            socketProcessor.setHttpClient(this.httpClient);
+            new Thread(socketProcessor).start();
         }
     }
+
 }

@@ -21,7 +21,7 @@ public class TestHttpClient {
      * @param rawData Данные что отправить
      * @return данные что ответить
      */
-    public String SendData(String rawData){
+    public String sendData(String rawData){
         //todo send end get
         return rawData;
     }
