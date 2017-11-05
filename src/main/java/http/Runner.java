@@ -7,8 +7,10 @@ public class Runner {
         String cfsHost = "localhost";
         TestHttpClient client = new TestHttpClient(cfsPort, cfsHost);
         TestHttpServer server = new TestHttpServer(listenPort, client);
+        TestHttpServer server2 = new TestHttpServer(cfsPort, client);
         try {
             server.start();
+            server2.start();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

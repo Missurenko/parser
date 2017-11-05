@@ -13,6 +13,7 @@ public class SocketProcessor implements Runnable {
     private InputStream is;
     private OutputStream os;
     private TestHttpClient httpClient;
+    private boolean testResponce = true;
 
     public SocketProcessor(Socket s) throws Throwable {
         this.s = s;
@@ -23,18 +24,21 @@ public class SocketProcessor implements Runnable {
     public void run() {
         try {
             String inputHeaders = readInputHeaders();
-            String CFSresponce = this.httpClient.sendData(inputHeaders);
-//            this.writeRawResponse(CFSresponce);
-            writeResponse("<html><body><h1>Hello from Habrahabr</h1></body></html>");
+            if (this.testResponce) {
+                writeResponse("<html><body><h1>Hello from Habrahabr</h1></body></html>");
+            } else {
+                String CFSresponce = this.httpClient.sendData(inputHeaders);
+                this.writeRawResponse(CFSresponce);
+            }
         } catch (Throwable t) {
                 /*do nothing*/
-                t.printStackTrace();
+            t.printStackTrace();
         } finally {
             try {
                 s.close();
             } catch (Throwable t) {
                     /*do nothing*/
-                    t.printStackTrace();
+                t.printStackTrace();
             }
         }
         System.err.println("Client processing finished");
