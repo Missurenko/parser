@@ -10,20 +10,11 @@ import java.net.Socket;
 public class TestHttpServer {
     public int inputPort = 5555;
     public TestHttpClient httpClient;
+    public boolean isTestServer = true;
 
     public TestHttpServer(int inputPort, TestHttpClient httpClient) {
         this.inputPort = inputPort;
         this.httpClient = httpClient;
-    }
-
-    public static void main(String[] args) throws Throwable {
-        ServerSocket ss = new ServerSocket(5555);
-        while (true) {
-            Socket s = ss.accept();
-            System.err.println("Client accepted");
-            SocketProcessor socketProcessor = new SocketProcessor(s);
-            new Thread(socketProcessor).start();
-        }
     }
 
     public void start() throws Throwable {
@@ -34,6 +25,7 @@ public class TestHttpServer {
             System.err.println("Client accepted");
             SocketProcessor socketProcessor = new SocketProcessor(s);
             socketProcessor.setHttpClient(this.httpClient);
+            socketProcessor.setTestResponce(isTestServer);
             new Thread(socketProcessor).start();
         }
     }
