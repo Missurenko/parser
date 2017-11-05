@@ -479,7 +479,7 @@ public class Parser {
 //    private boolean leaveCss(Element child) {
 //        return child.getElementsByTag("link").size() != 0;
 //    }
-
+// sdasad
     // TODO возможно поменять на дерево
     // не очень ефективний способ получить всех наследников которие не имеют нащядков
     private List<Element> recursiveMetodGetAllChildByDepth0(Element element, List<Element> listOneDepthElem) {
