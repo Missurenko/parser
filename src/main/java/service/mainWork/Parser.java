@@ -3,14 +3,11 @@ package service.mainWork;
 
 import dto.BooleanDto;
 import dto.RecursiaForTagADto;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 
 /**
@@ -37,15 +34,19 @@ public class Parser {
         return element;
     }
 
-    private void deleteMetod(Element mainElement) {
+    // метод удаления
+    private void deleteMetodForCSS(Element mainElement) {
         List<Boolean> flagDeleteOrNot = new ArrayList<>();
 
+        // перебираем всех наследников
         for (int i = 0; i < mainElement.children().size(); i++) {
+            // если есть css оставить
             boolean flag = getFlagDeleteByFilters(mainElement.child(i), mainElement);
 
             flagDeleteOrNot.add(flag);
         }
         String ss = "ss";
+        // удаляем
         for (int i = flagDeleteOrNot.size() - 1; i >= 0; --i) {
             if (flagDeleteOrNot.get(i)) {
                 mainElement.child(i).remove();
@@ -54,7 +55,7 @@ public class Parser {
         }
     }
 
-
+    // перебирает и просто удаляет
     private void deleteOnly(Element mainElement, List<Boolean> whatDelete) {
         for (int i = whatDelete.size() - 1; i >= 0; --i) {
             if (whatDelete.get(i)) {
@@ -64,27 +65,33 @@ public class Parser {
         }
     }
 
-
+    // короткая рекурсия для CSS прохождения
     private void shortRecursive(Element mainElement) {
-        deleteMetod(mainElement);
+        deleteMetodForCSS(mainElement);
         for (Element child : mainElement.children()) {
             shortRecursive(child);
         }
     }
 
+    // основной метод рекурсии
     private void recursiveMetod(Element mainElement) {
         List<Boolean> deleteBlockList = new ArrayList<>();
+
         for (Element child : mainElement.children()) {
+            // если есть таг header или  footer удаляем в последствии
+            // теоретиески єто кусок кода удаляем
             if (mainElement.tag().toString().equals("body") &
                     child.tag().toString().equals("header") |
                     mainElement.tag().toString().equals("body") &
                             child.tag().toString().equals("footer")) {
                 deleteBlockList.add(true);
+                // удаляем таги
             } else if (flagDeleteNoNeedTags(child)) {
                 deleteBlockList.add(true);
             } else {
                 deleteBlockList.add(false);
             }
+            // вхождение в голову
             if (child.tag().toString().equals("head")) {
                 shortRecursive(child);
             }
@@ -95,7 +102,9 @@ public class Parser {
         deleteOnly(mainElement, deleteBlockList);
 
         List<Boolean> whatDelete = new ArrayList<>();
-        BooleanDto booleanDtoParant = booleanMetodGlobal(mainElement);
+        // получение детальной информации про кусок html
+        BooleanDto booleanDtoParant = getAllInfForBlock(mainElement);
+        // сделано чтоб не захоил вглубь
         if (mainElement.children().size() > 1) {
             if (!mainElement.tag().toString().equals("head") &
                     !mainElement.tag().toString().equals("html") &
@@ -103,7 +112,7 @@ public class Parser {
                 List<BooleanDto> booleanDtoChilds = new ArrayList<>();
                 for (Element child : mainElement.children()) {
 
-                    BooleanDto childDto = booleanMetodGlobal(child);
+                    BooleanDto childDto = getAllInfForBlock(child);
                     booleanDtoChilds.add(childDto);
                 }
 
@@ -156,7 +165,8 @@ public class Parser {
 
 
     }
-
+    // если основной елемент именит таг html
+    // и не имеит заглавних тагов удаляем
     private boolean htmlTagMetod(Element mainElement) {
         if (mainElement.tag().toString().equals("html")) {
 
@@ -336,7 +346,7 @@ public class Parser {
     }
 
     // this metod count all position what can be use for understand about what block need stay alive
-    private BooleanDto booleanMetodGlobal(Element mainElement) {
+    private BooleanDto getAllInfForBlock(Element mainElement) {
         BooleanDto booleanDto = new BooleanDto();
 
         if (mainElement.tag().toString().equals("head")) {
@@ -374,8 +384,8 @@ public class Parser {
     // метод которий считает таг keyWord Text and other
     private void countForBoolen(Element element, BooleanDto booleanDto) {
 
-        Element clone = element.clone();
-        List<Element> elementDepthOne = recursiveMetodGetAllChildByDepth0(clone, new ArrayList<>());
+        List<Element> elementDepthOne = recursiveMetodGetAllChildByDepth0(element, new ArrayList<>());
+        // елементи что имеют такие характерестики
         int countTagA = 0;
         int countTextKeyWord = 0;
         int containText = 0;
@@ -471,7 +481,7 @@ public class Parser {
 //    }
 
     // TODO возможно поменять на дерево
-    // не очень ефективний способ получить всех наследников
+    // не очень ефективний способ получить всех наследников которие не имеют нащядков
     private List<Element> recursiveMetodGetAllChildByDepth0(Element element, List<Element> listOneDepthElem) {
         // получаем все наследников
         List<Element> supportListElem = element.children();
